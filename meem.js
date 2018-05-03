@@ -145,6 +145,6 @@ app.get('/', function(req, res) {
 //};
 
 var http = require('http');
-http.createServer( app).listen(8000);
+http.createServer( app).listen(process.env.PORT || 8000);
 
 module.exports = app;
