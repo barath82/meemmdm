@@ -1,0 +1,139 @@
+<!doctype html>
+<html ng-app>
+  
+  <head>
+  <title>ServiceStack Send Complex Form (Synchronously)</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <style>
+      label { display: inline-block; width: 100px; text-align: right; margin-right: 20px; }
+  </style>
+  </head>
+  <body>
+
+  <input type="button" onclick="DeRegisterUser()" value="Deregister User" style="float: right;">
+
+  <h2>Enter Login Details </h2>
+
+  <p>Name <input type="text" id="namelogin" name="namelogin" /></p>
+  <p>Email <input type="text" id="emaillogin" name="emaillogin" /></p>
+  <p>Password <input type="password" id="passwordlogin" name="passwordlogin" /></p>
+
+  <p><button  onclick="LoginUser()">Login</button></p>
+
+
+
+<form method="get" id="regForm" action="/meem/auth/sign-up">
+</form>
+<form method="get" id="enrollForm" action="/meem/enrollment/enroll-form">
+</form>
+
+<script>
+
+
+</script>
+
+
+  <script>
+
+  
+  function LoginUser() {
+
+      var name = document.getElementById("namelogin").value;
+      var password = document.getElementById("passwordlogin").value;
+      var email = document.getElementById("emaillogin").value;
+
+      xhr = new XMLHttpRequest();
+      var url = "/meem/auth/login";
+      xhr.open("POST", url, true);
+      xhr.setRequestHeader("Content-type", "application/json");
+      xhr.onreadystatechange = function () { 
+
+        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 201) {
+          
+            var json = JSON.parse(xhr.responseText);
+
+            alert("Login Success");
+            updateTokenID(json.tokenID);
+            loadEnrollPage();
+
+        }
+        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 401) {
+
+          var json = JSON.parse(xhr.responseText);
+          if(json.message == "UnAuthorized, emailID not registered"){
+
+              alert("Email Not registered");
+              loadRegistrationPage();
+          }
+          else if(json.message == "UnAuthorized, password not matching"){
+            
+            alert("Password Incorrect");
+
+          }
+
+        }
+      }
+      
+      var data = JSON.stringify({"username": name,"password": password,"email": email});
+      xhr.send(data);
+  }
+
+  function updateTokenID(tokenID) {
+
+        sessionStorage.setItem("token", tokenID);
+  }
+
+  function loadRegistrationPage() {
+
+    document.getElementById('regForm').submit();
+  }
+
+  function loadEnrollPage() {
+
+    document.getElementById('enrollForm').submit();
+  }
+  
+  function DeRegisterUser() {
+
+      var email = document.getElementById("emaillogin").value;
+
+    xhr = new XMLHttpRequest();
+    var url = "/meem/auth/deregister";
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    xhr.onreadystatechange = function () { 
+        if (xhr.readyState == 4 && xhr.status == 200) {
+          
+          alert("DeRegister Success");
+          updateTokenID("");
+          loadRegistrationPage();
+        }
+        
+      }
+
+    var tokenID =sessionStorage.getItem("token", tokenID);
+    var data = JSON.stringify({"tokenID": tokenID,"email":email});
+    xhr.send(data);
+  }
+  
+  
+  </script>
+
+
+
+
+
+<div class="add-info">
+  <span class="rightfloat">
+    <span class="red">
+      <span id="display">
+
+      </span>
+      </span>
+  </span>
+</div>
+  
+
+   </body>
+</html>
