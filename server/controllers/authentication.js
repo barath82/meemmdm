@@ -44,8 +44,7 @@ var authRegister = function(req, res){
     winston.log("info","check DB email")
     winston.log("info", req.body.username)
     /*Checking if email exists in DB*/
-    //User.findOne({email: req.body.email}, function(err, retQuery){
-    User.findOne({username: req.body.username}, function(err, retQuery){
+    User.findOne({email: req.body.email}, function(err, retQuery){
         console.log("email", req.body.email)
         if(err){
             winston.log("error in finding email from DB");
