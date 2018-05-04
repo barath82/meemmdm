@@ -106,6 +106,7 @@ app.post('/applepemupload', bodyParser.json(), function (req, res) {
 
     authentication.getTokenID(function(id){
         tokenID = id.authID;
+        console.log("tokenID initial", tokenID);
     })
 
     var upload = multer({
