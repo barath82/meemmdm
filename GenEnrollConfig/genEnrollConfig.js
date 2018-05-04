@@ -2,8 +2,8 @@ var exec = require('child_process').exec;
 var userid ;
 var utils = require('util');
 var apnscerPath = "./uploads/PushCert.pem";
-//var cmd_get_uid = "openssl x509 -noout -subject -in ./uploads/PushCert.pem";
-var cmd_get_uid = utils.format("openssl x509 -noout -subject -in %s",apnscerPath);
+//var cmd_get_uid = "powershell ./OpenSSL/bin/openssl x509 -noout -subject -in ./uploads/PushCert.pem";
+var cmd_get_uid = utils.format("powershell ./OpenSSL/bin/openssl x509 -noout -subject -in %s",apnscerPath);
 
 //var apnscerPath = path.join(__dirname + '../uploads/PushCert.pem');
 
@@ -17,13 +17,7 @@ var serverCrtPath = "./certs/ssl/Server.crt";
 var serverKeyPath = "./certs/ssl/Server.key";
 var caCrtPath = "./certs/ssl/CA.crt";
 
-var cmd_sign_mobileconfig  = utils.format("openssl smime -sign -in %s -out %s -signer %s -inkey %s -certfile %s -outform der -nodetach",
-enrollmobileconfigPath,
-signedenrollmobileconfigPath,
-serverCrtPath,
-serverKeyPath,
-caCrtPath
-)
+var cmd_sign_mobileconfig  = utils.format("powershell ./OpenSSL/bin/openssl smime -sign -in %s -out %s -signer %s -inkey %s -certfile %s -outform der -nodetach",enrollmobileconfigPath,signedenrollmobileconfigPath,serverCrtPath,serverKeyPath,caCrtPath);
 
 var onFinish;
 module.exports.entrypoint = function(cb){
