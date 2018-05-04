@@ -3,10 +3,11 @@
 
 var exec = require('child_process').exec;
 var util = require('util');
-var cmd_set_randfile = "set RANDFILE=.rnd";
+var cmd_set_randfile = "$ProgressPreference = \"SilentlyContinue\";set RANDFILE=.rnd";
 var cmd_gen_private_key = "powershell ./OpenSSL/bin/openssl genrsa -out ./GenPushCsr/temp-files/pushcer.key 2048";
 var cmd_gen_pus_csr ;
 var onFinish;
+var curlprogresssupress = "$ProgressPreference = \"SilentlyContinue\"";
 
 //Convert CSR to DER format
 var cmd_csr_to_der = "powershell ./OpenSSL/bin/openssl req -inform pem -outform der -in ./GenPushCsr/temp-files/push.csr -out ./GenPushCsr/temp-files/push.der -config ./OpenSSL/bin/openssl.cnf ";
