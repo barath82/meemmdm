@@ -281,10 +281,12 @@ var verifyTokenID = function(tokenID, cb){
 
 var getTokenID = function(cb){
 
-    User.findOne({}, 'authID', function(err, id){
+       User.findOne({}, 'authID', function(err, id){
         if(err){
             console.log('Error')
         } else{
+            console.log(id);
+            console.log(id.authID);
             cb(id);
         }
     })
