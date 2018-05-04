@@ -72,7 +72,8 @@ function cmd_signature_callback(error, stdout, stderr) {
     if (error) {
         console.log("cmd_csr_to_der_callback err", error);
     } else {
-        exec(cmd_signature_to_base64, cmd_signature_to_base64_callback);
+        //exec(cmd_signature_to_base64, cmd_signature_to_base64_callback);
+        exec(cmd_signature_to_base64, cmd_apple_root_callback);
     }
 }
 function cmd_signature_to_base64_callback(error, stdout, stderr) {
