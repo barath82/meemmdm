@@ -324,10 +324,11 @@ function processMDMCommand  (req,res) {
 }
 
 function sendMDMCommand (req,res) {
-	
+	console.log("mdm command");
+
 	if (!req.body) return res.sendStatus(400)
 	var tokenID = req.body.tokenID;
-
+	console.log(tokenID);
 	cert.verifyTokenID(tokenID, function(bool){
 		if(bool){
 							
@@ -509,7 +510,7 @@ router.post('/profiles/email',bodyParser.text({type: 'text/html' }),setEmailprof
 router.post('/profiles/restrictions',bodyParser.text({type: 'text/html' }),setRestrictionprofile);
 
 router.post('/profiles',bodyParser.text({type: 'text/html' }),function name(req,res) {
-	
+	console.log("inside profiles")
 	var tokenID = req.body.tokenID;
 	
 	cert.verifyTokenID(tokenID, function(bool){
