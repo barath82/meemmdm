@@ -107,56 +107,57 @@ app.post('/applepemupload', bodyParser.json(), function (req, res) {
     authentication.getTokenID(function(id){
         tokenID = id.authID;
         console.log("tokenID initial", tokenID);
+        var upload = multer({
+            storage: storage,
+            fileFilter: function (req, file, callback) {
+                var ext = path.extname(file.originalname)
+                callback(null, true)
+            }
+        }).single('userFile');
+        upload(req, res, function (err) {
+            res.end('File is uploaded')
+            fs.createReadStream(apnscerUploadPath).pipe(fs.createWriteStream(apnscerPath));
+          // genenrollonfig.entrypoint(function (status) {
+    
+    
+                authentication.fetchEmailByTokenId(tokenID, function(email){
+                    console.log('here before addAPNCert')
+                    certificate.saveAPNCert(email, fs.readFileSync(apnscerPath),fs.readFileSync(apnskeyPath) , function(){
+        
+        
+                        genenrollonfig.entrypoint(tokenID,function(status){
+        
+                            if(status){
+                
+                                console.log("******* Enroll Config Generated ******* ");
+                                res.send('File is uploaded. Use the link to enroll a device, https://www.codeswallop.com/meem/device/enroll');
+                
+                             }else{
+                                console.log("Enroll Config Generation failed");
+                                res.sendStatus(404);
+                
+                             }
+                        });
+        
+                    });
+                });
+    
+                // if (status) {
+    
+                //     console.log("******* Enroll Config Generated ******* ");
+                //     res.status(200);
+                //     res.send('File is uploaded. Use the link to enroll a device, https://192.168.0.9:8080/meem/device/checkin/enroll');
+    
+    
+                // } else {
+                //     console.log("Enroll Config Generation failed");
+                //     res.sendStatus(404);
+    
+                // }
+            })
     })
 
-    var upload = multer({
-        storage: storage,
-        fileFilter: function (req, file, callback) {
-            var ext = path.extname(file.originalname)
-            callback(null, true)
-        }
-    }).single('userFile');
-    upload(req, res, function (err) {
-        res.end('File is uploaded')
-        fs.createReadStream(apnscerUploadPath).pipe(fs.createWriteStream(apnscerPath));
-      // genenrollonfig.entrypoint(function (status) {
-
-
-            authentication.fetchEmailByTokenId(tokenID, function(email){
-                console.log('here before addAPNCert')
-                certificate.saveAPNCert(email, fs.readFileSync(apnscerPath),fs.readFileSync(apnskeyPath) , function(){
-    
-    
-                    genenrollonfig.entrypoint(tokenID,function(status){
-    
-                        if(status){
-            
-                            console.log("******* Enroll Config Generated ******* ");
-                            res.send('File is uploaded. Use the link to enroll a device, https://www.codeswallop.com/meem/device/enroll');
-            
-                         }else{
-                            console.log("Enroll Config Generation failed");
-                            res.sendStatus(404);
-            
-                         }
-                    });
-    
-                });
-            });
-
-            // if (status) {
-
-            //     console.log("******* Enroll Config Generated ******* ");
-            //     res.status(200);
-            //     res.send('File is uploaded. Use the link to enroll a device, https://192.168.0.9:8080/meem/device/checkin/enroll');
-
-
-            // } else {
-            //     console.log("Enroll Config Generation failed");
-            //     res.sendStatus(404);
-
-            // }
-        })
+   
     //})
 })
 /*Done */
