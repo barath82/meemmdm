@@ -5,6 +5,7 @@ var express = require('express');
 var router =  express.Router();
 var app = express();
 var path = require('path');
+//var appRoot = require('app-root-path');
 var winston = require('../../logconfig/winston');
 
 
@@ -34,19 +35,22 @@ var sendResponse = function(res, status){
 var authRegister = function(req, res){
     winston.log('info', 'inside register');
     if((!req.body.username)||(!req.body.password)||(!req.body.email)){
+        winston.log("error","all fields required")
         sendJSONResponse(res, 401,{
             "message":"UnAuthorized, all fields are required"
         });
         return;
     }
-    
+    winston.log("info","check DB")
     /*Checking if email exists in DB*/
     User.findOne({email: req.body.email}, function(err, retQuery){
         if(err){
-            console.log("error in finding email from DB");
+            winston.log("error in finding email from DB");
             return;
         }
+        winston.log("info","done finding")
         if(!retQuery){//if email does not exist in DB
+            winston.log("info","inside retquery")
             var user = new User();
             user.email = req.body.email;
             user.username = req.body.username;
@@ -289,14 +293,14 @@ router.use('/deregister', deregisterUser)
 /**Loading Pages */
 
 router.get('/sign-in', function name(req, res) {     
-    
-
+    winston.log("info","inside signin request")
     res.sendFile(path.join(__dirname + '/../static/login.html'));
 
     
 })
 router.get('/sign-up', function name(req, res) {
-    
+    winston.log("info","inside signup request")
+
     res.sendFile(path.join(__dirname + '/../static/register.html'));
 
 })
