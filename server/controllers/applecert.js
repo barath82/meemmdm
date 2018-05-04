@@ -6,7 +6,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var utils = require('util');
 var pemtools = require('pemtools')
-var x509 = require('x509');
+//var x509 = require('x509');
 
 var genenrollonfig = require('../../GenEnrollConfig/genEnrollConfig');
 var apnscerPath = path.join(__dirname + '/../../certs/push/PushCert.pem');
@@ -68,7 +68,7 @@ var sendAPNCertDetails = function(req, res){
             
             if (fs.existsSync(apnscerPath)) {
 
-                var cert = x509.parseCert(apnscerPath);
+                //var cert = x509.parseCert(apnscerPath);
         
             // var myJSON = JSON.stringify(cert);
                 //console.log("myJSON: "+myJSON);
