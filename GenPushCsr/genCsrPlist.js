@@ -11,19 +11,19 @@ var onFinish;
 //Convert CSR to DER format
 var cmd_csr_to_der = "powershell ./OpenSSL/bin/openssl req -inform pem -outform der -in ./GenPushCsr/temp-files/push.csr -out ./GenPushCsr/temp-files/push.der -config ./OpenSSL/bin/openssl.cnf ";
 //convert file to base 64 string
-var cmd_pushcsr_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/push.der -out ./GenPushCsr/temp-files/pushbase64.txt -config ./OpenSSL/bin/openssl.cnf";
+var cmd_pushcsr_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/push.der -out ./GenPushCsr/temp-files/pushbase64.txt";
 //extarct siganature
-var cmd_signature = "powershell ./OpenSSL/bin/openssl sha1 -sign ./GenPushCsr/private.key -out ./GenPushCsr/temp-files/signed_output.rsa  ./GenPushCsr/temp-files/push.der -config ./OpenSSL/bin/openssl.cnf"
+var cmd_signature = "powershell ./OpenSSL/bin/openssl sha1 -sign ./GenPushCsr/private.key -out ./GenPushCsr/temp-files/signed_output.rsa  ./GenPushCsr/temp-files/push.der"
 //convert file to base 64 string
-var cmd_signature_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/signed_output.rsa -out ./GenPushCsr/temp-files/signed_output.txt -config ./OpenSSL/bin/openssl.cnf";
+var cmd_signature_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/signed_output.rsa -out ./GenPushCsr/temp-files/signed_output.txt";
 
 //downlaod apple certificate and convert it to pem format    
 var cmd_download_apple_wwdrc = "powershell curl -o ./GenPushCsr/appleRootCer/AppleWWDRCA.cer 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'"
 var cmd_download_apple_root = "powershell curl -o ./GenPushCsr/appleRootCer/AppleIncRootCertificate.cer 'http://www.apple.com/appleca/AppleIncRootCertificate.cer'"
 
 //convert apple certificates
-var cmd_apple_wwdrca = "powershell ./OpenSSL/bin/openssl x509 -inform der -in ./GenPushCsr/appleRootCer/AppleWWDRCA.cer -out ./GenPushCsr/appleRootCer/AppleWWDRCA.pem -config ./OpenSSL/bin/openssl.cnf"
-var cmd_apple_root = "powershell ./OpenSSL/bin/openssl x509 -inform der -in ./GenPushCsr/appleRootCer/AppleIncRootCertificate.cer -out ./GenPushCsr/appleRootCer/AppleIncRootCertificate.pem -config ./OpenSSL/bin/openssl.cnf"
+var cmd_apple_wwdrca = "powershell ./OpenSSL/bin/openssl x509 -inform der -in ./GenPushCsr/appleRootCer/AppleWWDRCA.cer -out ./GenPushCsr/appleRootCer/AppleWWDRCA.pem"
+var cmd_apple_root = "powershell ./OpenSSL/bin/openssl x509 -inform der -in ./GenPushCsr/appleRootCer/AppleIncRootCertificate.cer -out ./GenPushCsr/appleRootCer/AppleIncRootCertificate.pem"
 
 function genRandFileCB(error, stdout, stderr) {
     if (error) {
@@ -42,12 +42,6 @@ function genPrivatekeyCB(error, stdout, stderr) {
         exec(cmd_gen_pus_csr, cmd_gen_push_csr_callback);
     }
 }
-
-
-
-
-
-
 
 //gen push.csr  callback
 function cmd_gen_push_csr_callback(error, stdout, stderr) {
@@ -89,10 +83,7 @@ function cmd_signature_to_base64_callback(error, stdout, stderr) {
     }
 }
 
-
 //downlaod apple certificate and convert it to pem format    
-
-
 function cmd_download_apple_wwdrc_callback(error, stdout, stderr) {
     if (error) {
         console.log("cmd_download_apple_wwdrc_callback err", error);
@@ -126,10 +117,6 @@ function cmd_apple_root_callback(error, stdout, stderr) {
     }
 }
 
-
-
-
-
 function startPrepaingPushCsr() {
     console.log('-----   creating push csr plist   --------');
 
@@ -140,10 +127,6 @@ function startPrepaingPushCsr() {
     var applerootca = fs.readFileSync('./GenPushCsr/appleRootCer/AppleIncRootCertificate.pem', "utf8");
     var pushcsrbase64 = fs.readFileSync('./GenPushCsr/temp-files/pushbase64.txt', "utf8");
     var signrsabase64 = fs.readFileSync('./GenPushCsr/temp-files/signed_output.txt', "utf8");
-
-
-
-
     var json = {
         "PushCertCertificateChain": mdmdata + applewwdcrca + applerootca,
         "PushCertRequestCSR": pushcsrbase64,
@@ -158,8 +141,6 @@ function startPrepaingPushCsr() {
 }   
 
 //callback chian to generate applepush.csr
-
-
 exports.entrypoint = function (email,countrycode,cb){
     console.log("---------- start preparing files ----------");
     var sub = "/emailAddress=" + email + "/C=" + countrycode ;
