@@ -5,6 +5,7 @@ var express = require('express');
 var router =  express.Router();
 var app = express();
 var path = require('path');
+var winston = require('../../logconfig/winston');
 
 
  var bodyParser = require('body-parser');
@@ -31,6 +32,7 @@ var sendResponse = function(res, status){
  * @returns tokenID - created using Json Web Token library
  */
 var authRegister = function(req, res){
+    winston.log('info', 'inside register');
     if((!req.body.username)||(!req.body.password)||(!req.body.email)){
         sendJSONResponse(res, 401,{
             "message":"UnAuthorized, all fields are required"
