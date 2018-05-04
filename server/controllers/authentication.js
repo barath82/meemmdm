@@ -34,7 +34,6 @@ var sendResponse = function(res, status){
  */
 var authRegister = function(req, res){
     winston.log('info', 'inside register');
-    console.log("email", req.body.email)
     if((!req.body.username)||(!req.body.password)||(!req.body.email)){
         winston.log("error","all fields required")
         sendJSONResponse(res, 401,{
@@ -43,9 +42,10 @@ var authRegister = function(req, res){
         return;
     }
     winston.log("info","check DB email")
-    console.log("email", req.body.email)
+    winston.log("info", req.body.username)
     /*Checking if email exists in DB*/
-    User.findOne({email: req.body.email}, function(err, retQuery){
+    //User.findOne({email: req.body.email}, function(err, retQuery){
+    User.findOne({username: req.body.username}, function(err, retQuery){
         console.log("email", req.body.email)
         if(err){
             winston.log("error in finding email from DB");
