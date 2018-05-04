@@ -1,15 +1,11 @@
 var mongoose = require('mongoose');
 var winston = require('../../logconfig/winston');
 var gracefulShutdown;
-var dbURI = 'mongodb://localhost/meemgdpr';
-if (process.env.NODE_ENV === 'production') {
-  dbURI = process.env.MONGOLAB_URI;
-}
-
-mongoose.connect(process.env.CUSTOMCONNSTR_MongolabUri || dbURI);
+winston.log("info","Mongoose DB ");
+mongoose.connect(process.env.CUSTOMCONNSTR_MongolabUri);
 // CONNECTION EVENTS
 mongoose.connection.on('connected', function() {
-    winston.log("info","Mongoose connected to " + dbURI);
+    winston.log("info","Mongoose connected to ");
 });
 mongoose.connection.on('error', function(err) {
     winston.log("info","Mongoose connection error: " + err);
