@@ -22,7 +22,7 @@ enrollmobileconfigPath,
 signedenrollmobileconfigPath,
 serverCrtPath,
 serverKeyPath,
-caCrtPath,
+caCrtPath
 )
 
 var onFinish;
