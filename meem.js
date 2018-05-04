@@ -131,11 +131,11 @@ app.post('/applepemupload', bodyParser.json(), function (req, res) {
                         if(status){
             
                             console.log("******* Enroll Config Generated ******* ");
-                            res.end(); 
+                            res.send('File is uploaded. Use the link to enroll a device, https://www.codeswallop.com/meem/device/enroll');
             
                          }else{
                             console.log("Enroll Config Generation failed");
-                            res.end(); 
+                            res.sendStatus(404);
             
                          }
                     });
