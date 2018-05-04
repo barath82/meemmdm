@@ -329,7 +329,7 @@ function sendMDMCommand (req,res) {
 	if (!req.body) return res.sendStatus(400)
 	var tokenID = req.body.tokenID;
 	console.log(tokenID);
-	cert.verifyTokenID(tokenID, function(bool){
+	authentication.verifyTokenID(tokenID, function(bool){
 		if(bool){
 							
 		  console.log('Token: '+tokenID +' Verified');
@@ -357,7 +357,7 @@ function setRestrictionprofile (req,res) {
 
 	console.log("Set Restriction Profile");
 
-	cert.verifyTokenID(tokenID, function(bool){
+	authentication.verifyTokenID(tokenID, function(bool){
 		
 		if(bool){	
 
@@ -513,7 +513,7 @@ router.post('/profiles',bodyParser.text({type: 'text/html' }),function name(req,
 	console.log("inside profiles")
 	var tokenID = req.body.tokenID;
 	
-	cert.verifyTokenID(tokenID, function(bool){
+	authentication.verifyTokenID(tokenID, function(bool){
 		
 		if(bool){	
 			console.log('Token: '+tokenID +' Verified');
