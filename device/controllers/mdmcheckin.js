@@ -74,7 +74,7 @@ function processMDMCheckinCommand  (req,res) {
             if(MessageType == "Authenticate"){
                 console.log("Authenticate Message!");
 
-                device.saveAuthenticationDetail('rakshith@meemmemory.com', myObj);
+                device.saveAuthenticationDetail('barath@meemmemory.com', myObj);
 
                 fs.writeFile("./plists/checkin/Authenticate.plist",plist.build(myObj), function(err) {
                         if(err) {
@@ -87,7 +87,7 @@ function processMDMCheckinCommand  (req,res) {
                 
                 console.log("Device Enrolled! TokenUpdate Received");
 
-                device.saveTokenUpdate('rakshith@meemmemory.com', myObj);
+                device.saveTokenUpdate('barath@meemmemory.com', myObj);
                 fs.writeFile("./plists/checkin/TokenUpdate.plist",plist.build(myObj), function(err) {
                         if(err) {
                             return console.log(err);
