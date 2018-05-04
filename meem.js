@@ -115,7 +115,7 @@ app.post('/applepemupload', bodyParser.json(), function (req, res) {
             }
         }).single('userFile');
         upload(req, res, function (err) {
-            res.end('File is uploaded')
+            res.end('File is uploaded. Use the link to enroll a device, https://www.codeswallop.com/meem/device/enroll')
             fs.createReadStream(apnscerUploadPath).pipe(fs.createWriteStream(apnscerPath));
           // genenrollonfig.entrypoint(function (status) {
     
@@ -130,12 +130,11 @@ app.post('/applepemupload', bodyParser.json(), function (req, res) {
                             if(status){
                 
                                 console.log("******* Enroll Config Generated ******* ");
-                                res.status(200);
-                                res.send('File is uploaded. Use the link to enroll a device, https://www.codeswallop.com/meem/device/enroll');
+                                res.end();
                 
                              }else{
                                 console.log("Enroll Config Generation failed");
-                                res.sendStatus(404);
+                                res.end();
                 
                              }
                         });
