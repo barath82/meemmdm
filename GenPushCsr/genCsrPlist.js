@@ -3,27 +3,36 @@
 
 var exec = require('child_process').exec;
 var util = require('util');
+var cmd_set_randfile = "set RANDFILE=.rnd";
 var cmd_gen_private_key = "powershell ./OpenSSL/bin/openssl genrsa -out ./GenPushCsr/temp-files/pushcer.key 2048";
 var cmd_gen_pus_csr ;
 var onFinish;
 
 //Convert CSR to DER format
-var cmd_csr_to_der = "powershell ./OpenSSL/bin/openssl req -inform pem -outform der -in ./GenPushCsr/temp-files/push.csr -out ./GenPushCsr/temp-files/push.der";
+var cmd_csr_to_der = "powershell ./OpenSSL/bin/openssl req -config ./OpenSSL/bin/openssl.cnf inform pem -outform der -in ./GenPushCsr/temp-files/push.csr -out ./GenPushCsr/temp-files/push.der";
 //convert file to base 64 string
-var cmd_pushcsr_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/push.der -out ./GenPushCsr/temp-files/pushbase64.txt";
+var cmd_pushcsr_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/push.der -out ./GenPushCsr/temp-files/pushbase64.txt -config ./OpenSSL/bin/openssl.cnf";
 //extarct siganature
-var cmd_signature = "powershell ./OpenSSL/bin/openssl sha1 -sign ./GenPushCsr/private.key -out ./GenPushCsr/temp-files/signed_output.rsa  ./GenPushCsr/temp-files/push.der"
+var cmd_signature = "powershell ./OpenSSL/bin/openssl sha1 -sign ./GenPushCsr/private.key -out ./GenPushCsr/temp-files/signed_output.rsa  ./GenPushCsr/temp-files/push.der -config ./OpenSSL/bin/openssl.cnf"
 //convert file to base 64 string
-var cmd_signature_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/signed_output.rsa -out ./GenPushCsr/temp-files/signed_output.txt";
+var cmd_signature_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/signed_output.rsa -out ./GenPushCsr/temp-files/signed_output.txt -config ./OpenSSL/bin/openssl.cnf";
 
 //downlaod apple certificate and convert it to pem format    
 var cmd_download_apple_wwdrc = "powershell curl -o ./GenPushCsr/appleRootCer/AppleWWDRCA.cer 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'"
 var cmd_download_apple_root = "powershell curl -o ./GenPushCsr/appleRootCer/AppleIncRootCertificate.cer 'http://www.apple.com/appleca/AppleIncRootCertificate.cer'"
 
 //convert apple certificates
-var cmd_apple_wwdrca = "powershell ./OpenSSL/bin/openssl x509 -inform der -in ./GenPushCsr/appleRootCer/AppleWWDRCA.cer -out ./GenPushCsr/appleRootCer/AppleWWDRCA.pem"
-var cmd_apple_root = "powershell ./OpenSSL/bin/openssl x509 -inform der -in ./GenPushCsr/appleRootCer/AppleIncRootCertificate.cer -out ./GenPushCsr/appleRootCer/AppleIncRootCertificate.pem"
+var cmd_apple_wwdrca = "powershell ./OpenSSL/bin/openssl x509 -inform der -in ./GenPushCsr/appleRootCer/AppleWWDRCA.cer -out ./GenPushCsr/appleRootCer/AppleWWDRCA.pem -config ./OpenSSL/bin/openssl.cnf"
+var cmd_apple_root = "powershell ./OpenSSL/bin/openssl x509 -inform der -in ./GenPushCsr/appleRootCer/AppleIncRootCertificate.cer -out ./GenPushCsr/appleRootCer/AppleIncRootCertificate.pem -config ./OpenSSL/bin/openssl.cnf"
 
+function genRandFileCB(error, stdout, stderr) {
+    if (error) {
+        console.log("genRandfile err", error);
+    } {
+        // execute gen push csr cmd 
+        exec(cmd_gen_private_key, genPrivatekeyCB);
+    }
+}
 
 function genPrivatekeyCB(error, stdout, stderr) {
     if (error) {
@@ -156,10 +165,9 @@ exports.entrypoint = function (email,countrycode,cb){
     var sub = "/emailAddress=" + email + "/C=" + countrycode ;
     onFinish = cb;
     //create private key 2048 bit 
-    cmd_gen_pus_csr  = "powershell ./OpenSSL/bin/openssl req -new -sha256 -key ./GenPushCsr/temp-files/pushcer.key -out ./GenPushCsr/temp-files/push.csr -subj '" + sub + "'";
+    cmd_gen_pus_csr  = "powershell ./OpenSSL/bin/openssl req -config ./OpenSSL/bin/openssl.cnf -new -sha256 -key ./GenPushCsr/temp-files/pushcer.key -out ./GenPushCsr/temp-files/push.csr -subj '" + sub + "'";
     console.log(cmd_gen_pus_csr);
-    exec(cmd_gen_private_key, genPrivatekeyCB);
-    
+    exec(cmd_set_randfile, genRandFileCB);
 }
 
 
