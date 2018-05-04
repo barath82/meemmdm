@@ -1,8 +1,0 @@
-[ ssl_server ]
-basicConstraints        = CA:FALSE
-nsCertType              = server
-keyUsage                = digitalSignature, keyEncipherment
-extendedKeyUsage        = serverAuth, nsSGC, msSGC
-#nsComment               = "OpenSSL Certificate for SSL Web Server"
-subjectAltName          = IP:192.168.0.56,DNS:192.168.0.56,URI:https://192.168.0.56:8080/
-

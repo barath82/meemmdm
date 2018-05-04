@@ -21,7 +21,7 @@ cName2=""
 cName3="MEEM devices"
 
 #email address
-email="aswin@meemmemory.com"
+email="barath@meemmemory.com"
 
 
 
@@ -41,37 +41,37 @@ email="aswin@meemmemory.com"
 
 
 
-echo ""
-echo "Setting up server.cnf."
-echo "Please enter the Hostname or IP address of your server."
-read IP
-sed -i -e "s/<SERVER_IP>/$IP/g" server.cnf
-echo "Done."
-echo ""
-cName2=$IP
-
-echo ""
-echo "Setting up certificates for MDM server testing!"
-echo ""
-echo "1. Creating Certificate Authority (CA)"
-#echo " ** For 'Common Name' enter something like 'MDM Test CA'"
-#echo " ** Create and a remember the PEM pass phrase for use later on"
-echo ""
-subject="/CN=$cName1/emailAddress=$email/C=$country/ST=$state/L=$city/O=$org/OU=$unit"
-openssl req -new -x509 -extensions v3_ca -keyout cakey.key -out cacert.crt -days 365 -subj "$subject"
-echo ""
-echo "2. Creating the Web Server private key and certificate request"
-# echo " ** For 'Common Name' enter your server's IP address **"
-echo ""
-
-subject="/CN=$cName2/emailAddress=$email/C=$country/ST=$state/L=$city/O=$org/OU=$unit"
-openssl genrsa 2048 > server.key
-openssl req -new -key server.key -out server.csr -subj "$subject"
-
-echo ""
-echo "3. Signing the server key with the CA. You'll use the PEM pass phrase from step 1."
-echo ""
-openssl x509 -req -days 365 -in server.csr -CA cacert.crt -CAkey cakey.key -CAcreateserial -out server.crt -extfile ./server.cnf -extensions ssl_server 
+#echo ""
+#echo "Setting up server.cnf."
+#echo "Please enter the Hostname or IP address of your server."
+#read IP
+#sed -i -e "s/<SERVER_IP>/$IP/g" server.cnf
+#echo "Done."
+#echo ""
+#cName2=$IP
+#
+#echo ""
+#echo "Setting up certificates for MDM server testing!"
+#echo ""
+#echo "1. Creating Certificate Authority (CA)"
+##echo " ** For 'Common Name' enter something like 'MDM Test CA'"
+##echo " ** Create and a remember the PEM pass phrase for use later on"
+#echo ""
+#subject="/CN=$cName1/emailAddress=$email/C=$country/ST=$state/L=$city/O=$org/OU=$unit"
+#openssl req -new -x509 -extensions v3_ca -keyout cakey.key -out cacert.crt -days 365 -subj "$subject"
+#echo ""
+#echo "2. Creating the Web Server private key and certificate request"
+## echo " ** For 'Common Name' enter your server's IP address **"
+#echo ""
+#
+#subject="/CN=$cName2/emailAddress=$email/C=$country/ST=$state/L=$city/O=$org/OU=$unit"
+#openssl genrsa 2048 > server.key
+#openssl req -new -key server.key -out server.csr -subj "$subject"
+#
+#echo ""
+#echo "3. Signing the server key with the CA. You'll use the PEM pass phrase from step 1."
+#echo ""
+#openssl x509 -req -days 365 -in server.csr -CA cacert.crt -CAkey cakey.key -CAcreateserial -out server.crt -extfile ./server.cnf -extensions ssl_server 
 
 
 
@@ -92,12 +92,12 @@ openssl pkcs12 -export -out identity.p12 -inkey identity.key -in identity.crt -c
 
 
 
-echo ""
-echo "6. Copying keys and certs to server folder"
-# Move relevant certs to the /server/ directory
-mv server.key ../ssl/Server.key
-mv server.crt ../ssl/Server.crt
-mv cacert.crt ../ssl/CA.crt
+#echo ""
+#echo "6. Copying keys and certs to server folder"
+## Move relevant certs to the /server/ directory
+#mv server.key ../ssl/Server.key
+#mv server.crt ../ssl/Server.crt
+#mv cacert.crt ../ssl/CA.crt
 mv identity.crt ../ssl/identity.crt
 cp identity.p12 ../identity/identity.p12
 
