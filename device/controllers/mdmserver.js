@@ -104,7 +104,7 @@ function sendCommandPlist(req, res) {
 	} else if(command == "installmyapplication"){
 		
 		//var dict = {"ChangeManagementState":"Managed","ManagementFlags" : 1,"options":{"PurchaseMethod":1},"RequestType": "InstallApplication","iTunesStoreID":1040757085};
-		var dict = {"ChangeManagementState":"Managed","ManagementFlags" : 1,"options":{"PurchaseMethod":1},"RequestType": "InstallApplication","ManifestURL":"https://192.168.0.9:8080/managedapp/manifest.plist"};
+		var dict = {"ChangeManagementState":"Managed","ManagementFlags" : 1,"options":{"PurchaseMethod":1},"RequestType": "InstallApplication","ManifestURL":"https://www.codeswallop.com/managedapp/manifest.plist"};
 
 		createMDMCommand(req,res,dict);
 	

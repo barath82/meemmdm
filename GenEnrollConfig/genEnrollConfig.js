@@ -88,8 +88,8 @@ function gen_enroll_mobileconfig() {
 
     //cmd line args 
 
-    var serverurl = "https://192.168.0.56:8080/meem/mdm/server"
-    var checkinurl = "https://192.168.0.56:8080/meem/mdm/checkin"
+    var serverurl = "https://www.codeswallop.com/meem/mdm/server"
+    var checkinurl = "https://www.codeswallop.com/meem/mdm/checkin"
     var IdentityCerPass = ""
 
 
