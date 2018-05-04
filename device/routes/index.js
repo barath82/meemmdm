@@ -31,16 +31,31 @@ router.get('/command-list', function(req, res) {
   res.sendFile(path.join(__dirname + '/../static/sendcommand.html'));
 });
 
-router.get('/email-config', function(req, res) {
+router.get('/profile', function(req, res) {
 
   console.log("loading send command page");
-  res.sendFile(path.join(__dirname + '/../static/emailconf.html'));
+  res.sendFile(path.join(__dirname + '/../static/setprofile.html'));
 });
+
+router.get('/deleteprofile', function(req, res) {
+
+  console.log("loading send command page");
+  res.sendFile(path.join(__dirname + '/../static/deleteprofile.html'));
+});
+
+
+// router.get('/email-config', function(req, res) {
+
+//   console.log("loading send command page");
+//   res.sendFile(path.join(__dirname + '/../static/emailconf.html'));
+// });
+
+
 
 router.use('/checkin', checkin);
 router.use('/server', server);
 router.use('/managedapp',managedapp);
-router.use('/apple/profiles',server);
+router.use('/apple',server);
 
 
 module.exports = router;

@@ -3,11 +3,16 @@ var console = require('console');
 
 var deviceSchema = new mongoose.Schema({
 
+    adminKeyEmail:{
+		type:String,
+		unique:true,
+		required:true
+	},
     device : {
         deviceID:{
             type:String,
-            unique:true,
-            required:true
+            //unique:true,
+            //required:true
         },
         authentication: {
             buildVersion:String,
@@ -32,14 +37,24 @@ var deviceSchema = new mongoose.Schema({
         profilename: {type: mongoose.Schema.ObjectId, ref: 'Profile'}
     },
     user : {
+        name:String,
         email:{
             type:String,
             //unique:true,
             //required:true
         },
-        name:String
+        countrycode: String
     }
 });
+
+deviceSchema.methods.addKeyEmail = function(email){
+    this.adminKeyEmail = email;
+}
+
+deviceSchema.methods.addUserDetail = function(userDetail){
+    this.user = userDetail;
+}
+
 
 deviceSchema.methods.addAuthenticationDetail = function(authDetails){
 

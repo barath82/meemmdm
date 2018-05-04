@@ -1,23 +1,70 @@
-var mongoose = require('mongoose');
-var User = mongoose.model('user');
+var mongoose = require('mongoose')
+var Certificate = require('../models/certDB');
 
-module.exports.addAPNCert = function(certAPN){
-    User.findOne({'apnCert.email' : certAPN.email} , 'apnCert', function(err, apnCerti){
-        apnCerti.setAPNCert(certAPN)
+module.exports.addCertEmail = function(email) {
+    var crt = new Certificate();
 
-        apnCerti.save(function(err){
+    console.log('Here in addCertEmail');
+    crt.addKeyEmail(email);
+    console.log('Here in addCertEmail');
+
+    crt.save(function(err){
+        if(err)
+            console.log('Error while saving the email key')
+        else
+            console.log('Email is successfully stored')
+    });
+}
+
+module.exports.saveAPNCert = function(email, apnCert ,apnKey, onfinish){
+
+    Certificate.findOne({adminKeyEmail : email}, function(err, crt){
+        crt.addAPNCert(apnCert, apnKey);
+
+        crt.save(function(err){
             if(err)
-                console.log('Error while saving the APN cert');
-                else{
-                    console.log('SUCCESSFULY stored the certificate detail')
-                }
+                console.log('Error while saving the APN cert')
+            else
+                console.log('APN is successfully stored')
+                onfinish();
         });
     })
 }
 
+module.exports.addMobileConfig = function(email, mobileconfig){
 
-module.exports.verifyTokenID = function(tokenID, cb){
+    console.log('***')
+    console.log(email)
+    Certificate.findOne({adminKeyEmail : email}, function(err, crt){
+        crt.addMobileConfig(mobileconfig);
 
-    cb(true);
+        crt.save(function(err){
+            if(err)
+                console.log('Error while saving the mobile config')
+            else
+                console.log('mobileConfig is successfully stored')
+        });
+    })
+}
 
+module.exports.getAPNCert = function(email, cb){
+
+    Certificate.findOne({adminKeyEmail : email}, 'apnCert apnKey', function(err, crt){
+
+        if(err){
+            console.log('Error while fetching the APN cert')
+        } else
+        cb(crt);
+    });
+}
+
+module.exports.getMobConfig = function(email, cb){
+
+    Certificate.findOne({adminKeyEmail : email}, 'mobConfigCert', function(err, crt){
+
+        if(err){
+            console.log('Error while fetching the APN cert')
+        } else
+        cb(crt); 
+    });
 }

@@ -93,4 +93,4 @@ userSchema.methods.verifyAuthID = function(authID) {
 	return this.authID === authID;
 };
 
-mongoose.model('user', userSchema,'user');
+module.exports = mongoose.model('user', userSchema,'user');

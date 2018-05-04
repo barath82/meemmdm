@@ -1,6 +1,10 @@
 var exec = require('child_process').exec;
 var userid ;
 var utils = require('util');
+var certificate = require('../server/controllers/certificate');
+var authentication = require('../server/controllers/authentication');
+var fs = require('fs');
+
 var apnscerPath = "./uploads/PushCert.pem";
 //var cmd_get_uid = "powershell ./OpenSSL/bin/openssl x509 -noout -subject -in ./uploads/PushCert.pem";
 var cmd_get_uid = utils.format("powershell ./OpenSSL/bin/openssl x509 -noout -subject -in %s",apnscerPath);
@@ -20,8 +24,14 @@ var caCrtPath = "./certs/ssl/CA.crt";
 var cmd_sign_mobileconfig  = utils.format("powershell ./OpenSSL/bin/openssl smime -sign -in %s -out %s -signer %s -inkey %s -certfile %s -outform der -nodetach",enrollmobileconfigPath,signedenrollmobileconfigPath,serverCrtPath,serverKeyPath,caCrtPath);
 
 var onFinish;
-module.exports.entrypoint = function(cb){
+var tokenID;
+module.exports.entrypoint = function( token, cb){
 
+//module.exports.entrypoint = function(cb){
+    //console.log('The token is')
+     console.log(token);
+
+     tokenID = token;
 console.log("Curr Path :"+ __dirname);
     console.log('-----   preparing push csr and enroll mobileconfig / plist   --------');
     //create private key 2048 bit 
@@ -68,7 +78,11 @@ function signEnrollMobileConfig(error, stdout, stderr) {
         console.log("signEnrollMobileConfig err", error);
         onFinish(false);
     } else{
-        // start prepareing mobileconfig
+        //signed mobileconfig
+        authentication.fetchEmailByTokenId(tokenID, function(email){
+            certificate.addMobileConfig(email, fs.readFileSync(signedenrollmobileconfigPath))
+        })
+        // TODO : call enrollmobile config save to DB from reading the file signedenrollmobileconfigPath
         onFinish(true);
     }
 }

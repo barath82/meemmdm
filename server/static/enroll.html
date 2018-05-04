@@ -291,10 +291,15 @@
 
   <p><button  onclick="sendEnrollDetails()">Submit</button></p>
 
+
   <form action="/meem/enrollment/appleCSR" method="get">
+    <h2>Download Csr for Apple Signing</h2>
+    <p><button type="submit"  onclick="alert('Downloading Push certificate')">Download</button></p>
+    </form>
+
+<!--     
   <h2>Download Csr for Apple Signing</h2>
-  <p><button type="submit"  onclick="alert('Downloading Push certificate')">Download</button></p>
-  </form>
+  <p><button  onclick="downloadAppleCsr()">Submit</button></p> -->
 
   <h2>Upload Apple Signed Push Certificate</h2>
 
@@ -475,6 +480,33 @@
     xhttp.send(data);
   }
  
+  function downloadAppleCsr() {
+
+      var xhttp = new XMLHttpRequest();
+
+      xhttp.onreadystatechange = function() {
+
+        if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+        // Typical action to be performed when the document is ready:
+
+
+
+        }
+        else if (this.readyState == XMLHttpRequest.DONE && this.status == 404) {
+        // Typical action to be performed when the document is ready:
+
+          alert(xhttp.responseText)
+
+        }
+
+      };
+      var tokenID =sessionStorage.getItem("token", tokenID);
+      var url = "/meem/enrollment/appleCSR?tokenID="+tokenID;
+
+      xhttp.open("GET", url, true);
+      xhttp.send();
+
+  }
 
   function updateTokenID(tokenID) {
 

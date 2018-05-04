@@ -74,30 +74,26 @@ function processMDMCheckinCommand  (req,res) {
             if(MessageType == "Authenticate"){
                 console.log("Authenticate Message!");
 
+                device.saveAuthenticationDetail('rakshith@meemmemory.com', myObj);
 
                 fs.writeFile("./plists/checkin/Authenticate.plist",plist.build(myObj), function(err) {
                         if(err) {
                             return console.log(err);
                         }
                         console.log("Authenticate file saved!");
-                });
-
-               // device.saveAuthenticationDetail(myObj);
-
+                }); 
             }
             else if(MessageType == "TokenUpdate"){
                 
                 console.log("Device Enrolled! TokenUpdate Received");
 
+                device.saveTokenUpdate('rakshith@meemmemory.com', myObj);
                 fs.writeFile("./plists/checkin/TokenUpdate.plist",plist.build(myObj), function(err) {
-                    if(err) {
-                        return console.log(err);
-                    }
-                    console.log("TokenUpdate file saved!");
-                });
-
-              //  device.saveTokenUpdate(myObj);
-                 
+                        if(err) {
+                            return console.log(err);
+                        }
+                        console.log("TokenUpdate file saved!");
+                }); 
             }
             else{
                 console.log(MessageType);

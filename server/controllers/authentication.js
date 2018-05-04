@@ -1,9 +1,12 @@
 var mongoose = require('mongoose');
-var User = mongoose.model('user');
+var User = require('../models/authDB');
 var console = require('console');
 var express = require('express');
 var router =  express.Router();
 var app = express();
+var certificate = require('./certificate');
+var profile = require('./profile');
+var device = require('./device');
 var path = require('path');
 //var appRoot = require('app-root-path');
 var winston = require('../../logconfig/winston');
@@ -57,6 +60,10 @@ var authRegister = function(req, res){
             user.email = req.body.email;
             user.username = req.body.username;
 
+
+            certificate.addCertEmail(req.body.email);
+            profile.saveKeyEmail(req.body.email);
+            device.saveKeyEmail(req.body.email);
             user.SetPassword(req.body.password);
             var authID = user.generateJWT();
             user.authID = authID;
@@ -254,34 +261,51 @@ var deregisterUser = function(req, res){
     });
 };
 
-// module.exports.addAPNCert = function(certAPN){
-//     User.findOne({'apnCert.email' : certAPN.email} , 'apnCert', function(err, apnCerti){
-//         apnCerti.setAPNCert(certAPN)
 
-//         apnCerti.save(function(err){
-//             if(err)
-//                 console.log('Error while saving the APN cert');
-//                 else{
-//                     console.log('SUCCESSFULY stored the certificate detail')
-//                 }
-//         });
-//     })
-// }
+var verifyTokenID = function(tokenID, cb){
+  
+    User.findOne({authID : tokenID}, function(err, id){
+        if(err){
+            console.log('Error in getting tokenID')
+        } 
+        if(!id){
+            console.log('Token id is not found')
+            //return false;
+            cb(false);
+        } else {
+             console.log('Token Id is present')
+            cb(true);
+        }
+    });
+}
 
-// module.exports.verifyTokenID = function(tokenID){
-//     console.log('Here is verifyTokenID')
-//     User.findOne({authID : tokenID}, function(err, id){
-//         if(err){
-//             console.log('Error in getting tokenID')
-//         } 
-//         if(id == null){
-//             console.log('NO ID')
-//             return true;
-//         } else {
-//             return false;
-//         }
-//     });
-// }
+var getTokenID = function(cb){
+
+    User.findOne({}, 'authID', function(err, id){
+        if(err){
+            console.log('Error')
+        } else{
+            cb(id);
+        }
+    })
+}
+
+var fetchEmailByTokenId = function(tokenID, email){
+
+    console.log('The tokn ID is')
+    console.log(tokenID)
+
+    User.findOne({authID : tokenID}, 'email', function(err, emailObj){
+        if(err){
+            console.log('Error in getting email ID by TOKEN');
+        }
+        console.log('GOT THE MOBILE ID')
+        ret = JSON.stringify(emailObj);
+        myObj = JSON.parse(ret);
+        console.log(ret);
+        email(emailObj.email);
+    })
+}
 
 router.use('/login', authLogin)
 
@@ -308,8 +332,10 @@ router.get('/sign-up', function name(req, res) {
 
 })
 
-
-
-module.exports = router;
-
+module.exports = {
+    router:router,
+    verifyTokenID: verifyTokenID,
+    getTokenID:getTokenID,
+    fetchEmailByTokenId : fetchEmailByTokenId
+}
 

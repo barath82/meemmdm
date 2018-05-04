@@ -31,21 +31,21 @@
       var password = document.getElementById("passwordreg").value;
       var email = document.getElementById("emailreg").value;
 
-      xhr = new XMLHttpRequest();
+      xhttp = new XMLHttpRequest();
       var url = "/meem/auth/register";
-      xhr.open("PUT", url, true);
-      xhr.setRequestHeader("Content-type", "application/json");
-      xhr.onreadystatechange = function () { 
-        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 201) {
+      xhttp.open("PUT", url, true);
+      xhttp.setRequestHeader("Content-type", "application/json");
+      xhttp.onreadystatechange = function () { 
+        if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 201) {
           
-          var json = JSON.parse(xhr.responseText);
+          var json = JSON.parse(xhttp.responseText);
           alert("Registration Success");
-          updateTokenID(json.tokenID);
+        //  updateTokenID(json.tokenID);
           loadLoginPage();
 
         }
-        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 401) {
-          var json = JSON.parse(xhr.responseText);
+        if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 401) {
+          var json = JSON.parse(xhttp.responseText);
           if(json.message == "UnAuthorized, all fields are required"){
 
               alert("UnAuthorized, all fields are required");
@@ -60,7 +60,7 @@
         }
       }
       var data = JSON.stringify({"username": name,"password": password,"email": email});
-      xhr.send(data);
+      xhttp.send(data);
   }
   
   

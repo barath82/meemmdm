@@ -9,22 +9,21 @@ var fs = require('fs');
 
 var generatecsr = require('../../GenPushCsr/genCsrPlist');
 var applecert = require('./applecert');
+var authentication = require('./authentication');
 var cert = require('./certificate');
-var device = require('./device');
+var device = require('./device')
 
 var name = "";
-var email ="";
-var countrycode ="";
+var email = "";
+var countrycode = "";
 
 // parse application/x-www-form-urlencoded
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
-router.use(bodyParser.text({type:"*/*"}));
+router.use(bodyParser.text({ type: "*/*" }));
 
 
 require('body-parser-xml')(bodyParser);
-
-
 
 router.get('/enroll-form', function(req, res) {
 
@@ -32,6 +31,7 @@ router.get('/enroll-form', function(req, res) {
     res.sendFile(path.join(__dirname + '/../static/enroll.html'));
   
 });
+
 
 
 router.get('/listdevices', function(req, res) {
@@ -42,7 +42,7 @@ router.get('/listdevices', function(req, res) {
     
     var tokenID = req.query.tokenID;
 
-    if(cert.verifyTokenID(tokenID, function(bool){
+    authentication.verifyTokenID(tokenID, function(bool){
         if(bool){
                             
             console.log('Token: '+tokenID +' Verified');
@@ -59,16 +59,17 @@ router.get('/listdevices', function(req, res) {
             console.log('Token: '+tokenID +' Mismatch');
             res.sendStatus(406);
         }
-    }));
+    });
    
 });
+
 
 router.get('/settings', function(req, res) {
     if (!req.body) return res.sendStatus(406)
     
     console.log('List Enrollment settings');
     var tokenID = req.query.tokenID;
-    if(cert.verifyTokenID(tokenID, function(bool){
+    authentication.verifyTokenID(tokenID, function(bool){
           if(bool){
                               
             console.log('Token: '+tokenID +' Verified');
@@ -82,38 +83,46 @@ router.get('/settings', function(req, res) {
             console.log('Token: '+tokenID +' Mismatch');
             res.sendStatus(404);
           }
-    }));
+    });
 
 
 });
 
-function downloadPushCsr(req,res) {
-  
-    var file = path.join(__dirname + '../../../GenPushCsr/csr-file-to-upload/applepush.csr');
+function downloadPushCsr(req, res) {
+
+    var file = path.join(__dirname + '/../../GenPushCsr/csr-file-to-upload/applepush.csr');
 
     console.log("Download Unsigned push CSR!");
 
     var tokenID = req.query.tokenID;
-    if(cert.verifyTokenID(tokenID, function(bool){
-          if(bool){
+
+    var string = JSON.stringify(req.query)
+    var myObj  = JSON.parse(string);
+    console.log(myObj);
+
+    // authentication.verifyTokenID(tokenID, function(bool){
+            
+    //       if(bool){
                               
-            console.log('Token: '+tokenID +' Verified');
+         //   console.log('Token: '+tokenID +' Verified');
             if (fs.existsSync(file)) {
 
-                res.status(200);
+                console.log("Push Csr Exists!!")
                 res.download(file); // Set disposition and send it.
-        
+
             }
             else{
+                console.log("Push Csr DOESNTExists!!")
+
                 res.sendStatus(404)
             }
 
-          } else{
+    //       } else{
           
-              console.log('Token: '+tokenID +' Mismatch');
-              res.sendStatus(404);
-            }
-    }));
+    //           console.log('Token: '+tokenID +' Mismatch');
+    //           res.sendStatus(404);
+    //         }
+    // });
     
 }
 
@@ -126,8 +135,11 @@ router.post('/enroll', function(req, res) {
 
     console.log('Enroll Device');
 
-    var tokenID = req.query.tokenID;
-    if(cert.verifyTokenID(tokenID, function(bool){
+    var tokenID = req.body.tokenID;
+
+    console.log(tokenID);
+    authentication.verifyTokenID(tokenID, function(bool){
+
           if(bool){
                               
             console.log('Token: '+tokenID +' Verified');
@@ -191,6 +203,9 @@ router.post('/enroll', function(req, res) {
                             console.log("push csr generation failed");
                         }
                     }
+
+
+
                     
                     generatecsr.entrypoint(email,countrycode,onPushcsrGeneration);
                 }
@@ -215,7 +230,7 @@ router.post('/enroll', function(req, res) {
               console.log('Token: '+tokenID +' Mismatch');
               res.sendStatus(406);
             }
-    }));
+    });
 
     
 });
@@ -227,5 +242,4 @@ router.use('/applecertificate/',applecert);
 
 
 module.exports = router;
-
 

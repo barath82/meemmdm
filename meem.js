@@ -8,6 +8,8 @@ var cors = require('cors');
 var winston = require('./logconfig/winston');
 
 var device = require('./server/controllers/device')
+var authentication = require('./server/controllers/authentication');
+var certificate = require('./server/controllers/certificate');
 
 require('./server/models/dbconfig');
 
@@ -38,14 +40,14 @@ app.use('/meem', routesApi);
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
         res.status(401);
-        res.json({"message" : err.name + ": " + err.message});
+        res.json({ "message": err.name + ": " + err.message });
     }
 });
 
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
+    app.use(function (err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
@@ -56,14 +58,13 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
         error: {}
     });
 });
-
 
 
 
@@ -77,61 +78,93 @@ var fs = require('fs');
 // app.use('/device', router);
 
 
- 
+
 /* File Upload*/
 var multer = require('multer');
 var apnscerPath = "./certs/push/PushCert.pem";
+var apnskeyPath = "./certs/push/PushCert.key";
+
 var apnscerUploadPath = "./uploads/PushCert.pem";
 var genenrollonfig = require('./GenEnrollConfig/genEnrollConfig');
 
 var storage = multer.diskStorage({
-	destination: function(req, file, callback) {
-		callback(null, "./uploads")
-	},
-	filename: function(req, file, callback) {
-		callback(null, "PushCert.pem")
-	}
+    destination: function (req, file, callback) {
+        callback(null, "./uploads")
+    },
+    filename: function (req, file, callback) {
+        callback(null, "PushCert.pem")
+    }
 })
 
 
-app.post('/applepemupload',bodyParser.json() ,function(req, res) {
+app.post('/applepemupload', bodyParser.json(), function (req, res) {
 
     console.log("File upload");
-	var upload = multer({
-		storage: storage,
-		fileFilter: function(req, file, callback) {
-			var ext = path.extname(file.originalname)
-			callback(null, true)
-		}
-	}).single('userFile');
-	upload(req, res, function(err) {
+
+    var tokenID;
+    //console.log(tokenID);
+
+    authentication.getTokenID(function(id){
+        tokenID = id.authID;
+    })
+
+    var upload = multer({
+        storage: storage,
+        fileFilter: function (req, file, callback) {
+            var ext = path.extname(file.originalname)
+            callback(null, true)
+        }
+    }).single('userFile');
+    upload(req, res, function (err) {
+        res.end('File is uploaded')
         fs.createReadStream(apnscerUploadPath).pipe(fs.createWriteStream(apnscerPath));
-        genenrollonfig.entrypoint(function(status){
-
-            if(status){
-
-                console.log("******* Enroll Config Generated ******* ");
-                res.status(200);
-                res.send('File is uploaded. Use the link to enroll a device, https://www.codeswallop.com/meem/device/enroll');
+      // genenrollonfig.entrypoint(function (status) {
 
 
-             }else{
-                console.log("Enroll Config Generation failed");
-                res.sendStatus(404); 
+            authentication.fetchEmailByTokenId(tokenID, function(email){
+                console.log('here before addAPNCert')
+                certificate.saveAPNCert(email, fs.readFileSync(apnscerPath),fs.readFileSync(apnskeyPath) , function(){
+    
+    
+                    genenrollonfig.entrypoint(tokenID,function(status){
+    
+                        if(status){
+            
+                            console.log("******* Enroll Config Generated ******* ");
+                            res.end(); 
+            
+                         }else{
+                            console.log("Enroll Config Generation failed");
+                            res.end(); 
+            
+                         }
+                    });
+    
+                });
+            });
 
-             }
-        });
+            // if (status) {
 
-	})
+            //     console.log("******* Enroll Config Generated ******* ");
+            //     res.status(200);
+            //     res.send('File is uploaded. Use the link to enroll a device, https://192.168.0.9:8080/meem/device/checkin/enroll');
+
+
+            // } else {
+            //     console.log("Enroll Config Generation failed");
+            //     res.sendStatus(404);
+
+            // }
+        })
+    //})
 })
-
 /*Done */
 
 /*Root*/
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
 
     res.sendFile(path.join(__dirname + '/index.html'));
-    
+
 });
 /*End */
 

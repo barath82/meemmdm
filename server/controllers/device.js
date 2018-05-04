@@ -1,19 +1,50 @@
 var Device  = require('../models/devicesDB')
 
-module.exports.saveAuthenticationDetail = function(authDetails){
+module.exports.saveKeyEmail = function(email){
+    var deviceObj = new Device();
+
+    deviceObj.addKeyEmail(email);
+
+    deviceObj.save(function(err){
+        if(err) {
+            console.log('Error while saving ' + err.message);
+        }
+        else{
+            console.log('Successfully stored')
+        }
+    });
+}
+
+module.exports.saveAuthenticationDetail = function(email, authDetails){
   
-     var deviceObj = new Device();
+     //var deviceObj = new Device();
 
-     deviceObj.addAuthenticationDetail(authDetails);
+    //  deviceObj.addAuthenticationDetail(authDetails);
 
-     deviceObj.save(function(err){
-         if(err) {
-             console.log('Error while saving ' + err.message);
-         }
-         else{
-             console.log('Successfully stored')
-         }
-     });
+    //  deviceObj.save(function(err){
+    //      if(err) {
+    //          console.log('Error while saving ' + err.message);
+    //      }
+    //      else{
+    //          console.log('Successfully stored')
+    //      }
+    //  });
+
+     Device.findOne({'adminKeyEmail' : email}, function(err, deviceObj){
+
+        if(err){
+            console.log('The error while fetching ' + err)
+        }
+        deviceObj.addAuthenticationDetail(authDetails);
+
+        deviceObj.save(function(err){
+            if(err)
+                console.log('Error while saving');
+                else{
+                    console.log('SUCCESSFULY stored')
+                }
+        });
+    })
  };
 
 //  module.exports.saveUserDetail = function(userDetail){
@@ -21,13 +52,13 @@ module.exports.saveAuthenticationDetail = function(authDetails){
     
 //  }
 
- module.exports.saveTokenUpdate = function(tokenUpdateArg){
+ module.exports.saveTokenUpdate = function(email, tokenUpdateArg){
 
      var UDID = tokenUpdateArg["plist"]["dict"]["string"]
 
      //console.log('Here in saveTokenUpdate ' + tokenUpdateArg["plist"]["dict"]["string"]["UDID"])
 
-     Device.findOne({'device.authentication.UDID' : UDID[3]}, function(err, deviceObj){
+     Device.findOne({'adminKeyEmail' : email}, function(err, deviceObj){
 
          if(err){
              console.log('The error while fetching ' + err)
@@ -57,8 +88,6 @@ module.exports.saveAuthenticationDetail = function(authDetails){
              else if(deviceList === null){
                  console.log('NULL object')
              }else{
-
-                console.log('222')
 
                  deviceList.forEach(function(list){
                     

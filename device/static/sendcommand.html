@@ -6,12 +6,9 @@
   <body>
 
 
-
-
 <h2>Select Command to Send</h2>
 
-<form action=" /meem/device/apple/profiles/command" method="post">
-  <select name="command">
+  <select id="command">
     <option value="deviceinfo" type="text">DeviceInformation</option>
     <option value="devicelock" type="text">DeviceLock</option>
     <option value="erasedevice" type="text">EraseDevice</option>
@@ -28,9 +25,52 @@
     <option value="removeapplication" type="text">RemoveApplication</option>
     
   </select>
-  <br><br>
-  <input type="submit" value="Submit">
-</form>
+  
+  <p><button  onclick="sendMDMCommand()">Send</button></p>
+
+
+
+<div class="add-info">
+  <span class="rightfloat">
+    <span class="red">
+      <span id="display">
+
+      </span>
+      </span>
+  </span>
+</div>
     
+
+<script>
+
+function sendMDMCommand() {
+
+      var tokenID =sessionStorage.getItem("token", tokenID);
+      var command = document.getElementById("command").value;
+        
+      xhttp = new XMLHttpRequest();
+      var url = "/meem/device/apple/profiles/command";
+      xhttp.open("POST", url, true);
+      xhttp.setRequestHeader("Content-type", "application/json");
+      xhttp.onreadystatechange = function () { 
+          if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
+              
+              alert(xhttp.responseText);
+          }
+          else if (xhttp.readyState == XMLHttpRequest.DONE) {
+              alert(xhttp.responseText);
+          }
+      }
+
+      var data = JSON.stringify({
+          "tokenID": tokenID,
+          "command" : command,  
+      });
+
+      xhttp.send(data);
+
+}
+</script>
+
   </body>
 </html>
