@@ -9,7 +9,7 @@ var cmd_gen_pus_csr ;
 var onFinish;
 
 //Convert CSR to DER format
-var cmd_csr_to_der = "powershell ./OpenSSL/bin/openssl req inform pem -outform der -in ./GenPushCsr/temp-files/push.csr -out ./GenPushCsr/temp-files/push.der -config ./OpenSSL/bin/openssl.cnf ";
+var cmd_csr_to_der = "powershell ./OpenSSL/bin/openssl req -inform pem -outform der -in ./GenPushCsr/temp-files/push.csr -out ./GenPushCsr/temp-files/push.der -config ./OpenSSL/bin/openssl.cnf ";
 //convert file to base 64 string
 var cmd_pushcsr_to_base64 = "powershell ./OpenSSL/bin/openssl base64 -in ./GenPushCsr/temp-files/push.der -out ./GenPushCsr/temp-files/pushbase64.txt -config ./OpenSSL/bin/openssl.cnf";
 //extarct siganature
