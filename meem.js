@@ -125,7 +125,7 @@ app.post('/applepemupload', bodyParser.json(), function (req, res) {
             }
         }).single('userFile');
         upload(req, res, function (err) {
-            res.end('File is uploaded')
+            res.end('File is uploaded. iOS Enroll link:http://www.codeswallop.com/meem/device/enroll')
     
         copyData(apnscerPath,apnscerUploadPath,function(params) {
     

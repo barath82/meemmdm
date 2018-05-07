@@ -104,7 +104,7 @@ function gen_enroll_mobileconfig() {
 
     var serverurl = "https://www.codeswallop.com/meem/mdm/server"
     var checkinurl = "https://www.codeswallop.com/meem/mdm/checkin"
-    var IdentityCerPass = ""
+    var IdentityCerPass = "meem"
 
 
     var identitycer = fs.readFileSync(identityCerPath);

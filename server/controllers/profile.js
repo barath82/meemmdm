@@ -168,7 +168,7 @@ module.exports.getEmailProfile  = function(email, cb){
             delete json1["_id"];
 
             console.log('++++++++++++++++++++++++++++++');
-            fs.writeFileSync("/home/rakshith/email.log", JSON.stringify(json1));
+            //fs.writeFileSync("/home/rakshith/email.log", JSON.stringify(json1));
 
             console.log(JSON.stringify(json1));
             

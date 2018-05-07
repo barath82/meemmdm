@@ -128,7 +128,7 @@ function sendCommandPlist(req, res) {
 		authentication.fetchEmailByTokenId(currtokenID, function(email){
 			profile.getEmailProfile(email, function(payloadValue){
 				
-				fs.writeFileSync("/home/rakshith/email1.log", JSON.stringify(payloadValue));
+				//fs.writeFileSync("/home/rakshith/email1.log", JSON.stringify(payloadValue));
 				var emailJson = payloadValue;
 				var plistfile = plist.build(emailJson);
 				var profilebase64data = new Buffer(plistfile).toString('ascii');
