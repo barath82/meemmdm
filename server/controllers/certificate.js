@@ -1,11 +1,13 @@
 var mongoose = require('mongoose')
 var Certificate = require('../models/certDB');
+var profile = require('./profile');
 
 module.exports.addCertEmail = function(email) {
     var crt = new Certificate();
 
     console.log('Here in addCertEmail');
     crt.addKeyEmail(email);
+    profile.saveKeyEmail(email);
     console.log('Here in addCertEmail');
 
     crt.save(function(err){

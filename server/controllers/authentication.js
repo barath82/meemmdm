@@ -5,7 +5,7 @@ var express = require('express');
 var router =  express.Router();
 var app = express();
 var certificate = require('./certificate');
-var profile = require('./profile');
+//var profile = require('./profile');
 var device = require('./device');
 var path = require('path');
 //var appRoot = require('app-root-path');
@@ -62,7 +62,7 @@ var authRegister = function(req, res){
 
 
             certificate.addCertEmail(req.body.email);
-            profile.saveKeyEmail(req.body.email);
+            //profile.saveKeyEmail(req.body.email);
             device.saveKeyEmail(req.body.email);
             user.SetPassword(req.body.password);
             var authID = user.generateJWT();
