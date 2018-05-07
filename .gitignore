@@ -4,3 +4,4 @@ node_modules/
 path/
 package-lock.json
 logs/*.log
+plists/enroll/
