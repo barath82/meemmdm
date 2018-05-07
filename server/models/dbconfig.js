@@ -1,8 +1,9 @@
 var mongoose = require('mongoose');
 var winston = require('../../logconfig/winston');
 var gracefulShutdown;
+var dbURI = 'mongodb://localhost/meemgdpr';
 winston.log("info","Mongoose DB ");
-mongoose.connect(process.env.CUSTOMCONNSTR_MongolabUri);
+mongoose.connect(process.env.CUSTOMCONNSTR_MongolabUri || dbURI);
 // CONNECTION EVENTS
 mongoose.connection.on('connected', function() {
     winston.log("info","Mongoose connected to ");

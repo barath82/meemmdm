@@ -9,22 +9,24 @@
   </style>
   </head>
   <body>
-
-  <input type="button" onclick="DeRegisterUser()" value="Deregister User" style="float: right;">
-
-  <h2>Enter Login Details </h2>
-
-  <p>Name <input type="text" id="namelogin" name="namelogin" /></p>
-  <p>Email <input type="text" id="emaillogin" name="emaillogin" /></p>
-  <p>Password <input type="password" id="passwordlogin" name="passwordlogin" /></p>
-
-  <p><button  onclick="LoginUser()">Login</button></p>
+      <div style="background-color:#bbb;">
 
 
+      <h2>Enter Login Details </h2>
 
-<form method="get" id="regForm" action="/meem/auth/sign-up">
-</form>
+      <p>Name <input type="text" id="namelogin" name="namelogin" /></p>
+      <p>Email <input type="text" id="emaillogin" name="emaillogin" /></p>
+      <p>Password <input type="password" id="passwordlogin" name="passwordlogin" /></p>
+
+      <p><button  onclick="LoginUser()">Login</button></p>
+      </div>
+
+
+
+
 <form method="get" id="enrollForm" action="/meem/enrollment/enroll-form">
+</form>
+<form method="get" id="regForm" action="/meem/auth/sign-up">
 </form>
 
 <script>
@@ -82,40 +84,15 @@
 
         sessionStorage.setItem("token", tokenID);
   }
+  function loadEnrollPage() {
 
+    document.getElementById('enrollForm').submit();
+  }
   function loadRegistrationPage() {
 
     document.getElementById('regForm').submit();
   }
 
-  function loadEnrollPage() {
-
-    document.getElementById('enrollForm').submit();
-  }
-  
-  function DeRegisterUser() {
-
-      var email = document.getElementById("emaillogin").value;
-
-    xhttp = new XMLHttpRequest();
-    var url = "/meem/auth/deregister";
-    xhttp.open("POST", url, true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-
-    xhttp.onreadystatechange = function () { 
-        if (xhttp.readyState == 4 && xhttp.status == 200) {
-          
-          alert("DeRegister Success");
-          updateTokenID("");
-          loadRegistrationPage();
-        }
-        
-      }
-
-    var tokenID =sessionStorage.getItem("token", tokenID);
-    var data = JSON.stringify({"tokenID": tokenID,"email":email});
-    xhttp.send(data);
-  }
   
   
   </script>

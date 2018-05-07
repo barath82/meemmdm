@@ -15,6 +15,20 @@ module.exports.saveKeyEmail = function(email){
     });
 }
 
+module.exports.saveUserDetail = function(email, usrDeatil){
+    Device.findOne({'adminKeyEmail' : email}, function(err, deviceObj){
+        deviceObj.addUserDetail(usrDeatil);
+
+        deviceObj.save(function(err){
+            if(err)
+                console.log('Error while saving');
+                else{
+                    console.log('SUCCESSFULY stored')
+                }
+        });
+    })
+}
+
 module.exports.saveAuthenticationDetail = function(email, authDetails){
   
      //var deviceObj = new Device();

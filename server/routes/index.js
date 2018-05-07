@@ -37,7 +37,7 @@ var device = require('../../device/routes/index');
 // });
 
 router.use('/auth', ctrlAuth.router);
-router.use('/profile/', ctrlProfile.router);
+//router.use('/profile/', ctrlProfile.router);
 router.use('/enrollment', enrollment);
 
 //  Connect all our routes to our application

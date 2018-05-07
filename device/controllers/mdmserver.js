@@ -33,10 +33,16 @@ var plistQueue = [];
 var emailaccname = "";
 var emailaddr = "";
 
-var allowcamera = false; 
-var allowdocsharing = false; 
-var allowScreenShot = false;
+/*Functionality*/
+var allowopenfrommanagedtounmanaged = false; 
+var allowopenfromunmanagedtomanaged = false; 
 
+
+/*Passcode*/
+var emailprofileName = "";
+var passcodeprofileName = "";
+var restrctionProfileName = "";
+var currtokenID="";
 
 router.get('/command-list', function(req, res) {
   res.sendFile(path.join(__dirname + '/../static/sendcommand.html'));
@@ -107,7 +113,7 @@ function sendCommandPlist(req, res) {
 	} else if(command == "installmyapplication"){
 		
 		//var dict = {"ChangeManagementState":"Managed","ManagementFlags" : 1,"options":{"PurchaseMethod":1},"RequestType": "InstallApplication","iTunesStoreID":1040757085};
-		var dict = {"ChangeManagementState":"Managed","ManagementFlags" : 1,"options":{"PurchaseMethod":1},"RequestType": "InstallApplication","ManifestURL":"https://192.168.0.9:8080/meem/device/managedapp/manifest.plist"};
+		var dict = {"ChangeManagementState":"Managed","ManagementFlags" : 1,"options":{"PurchaseMethod":1},"RequestType": "InstallApplication","ManifestURL":"https://www.codeswallop.com/meem/device/managedapp/manifest.plist"};
 
 		createMDMCommand(req,res,dict);
 	
@@ -118,37 +124,101 @@ function sendCommandPlist(req, res) {
 
 	}
 	else if(command == "addmanagedemail"){
-
-		var emailplist = './plists/mdmprofiles/Email.plist';
-
-		var plistfile = fs.readFileSync(emailplist);
 		
-		//var emailJson = {"PayloadContent":[{"EmailAccountDescription":"MDM MAIL ACC","EmailAccountName":emailaccname,"EmailAccountType":"EmailTypeIMAP","EmailAddress":emailaddr,"IncomingMailServerAuthentication":"EmailAuthNone","IncomingMailServerHostName":"imap.gmail.com","IncomingMailServerPortNumber":993,"IncomingMailServerUseSSL":true,"IncomingMailServerUsername":emailaddr,"OutgoingMailServerAuthentication":"EmailAuthNone","OutgoingMailServerHostName":"smtp.gmail.com  ","OutgoingMailServerPortNumber":465,"OutgoingMailServerUseSSL":true,"OutgoingMailServerUsername":emailaddr,"OutgoingPasswordSameAsIncomingPassword":true,"PayloadDescription":"Configures Email settings","PayloadDisplayName":"MEEM MAIL ACC","PayloadIdentifier":"com.apple.mail.managed.7181B285-8377-48DF-AD50-E2C59479050A","PayloadType":"com.apple.mail.managed","PayloadUUID":"7181B285-8377-48DF-AD50-E2C59479050A","PayloadVersion":1,"PreventMove":true,"SMIMEEnablePerMessageSwitch":false,"SMIMEEnabled":false,"SMIMEEncryptionEnabled":false,"SMIMESigningEnabled":false,"allowMailDrop":false,"disableMailRecentsSyncing":true}],"PayloadDisplayName":"EmailProfile","PayloadIdentifier":"com.apple.applicationaccess.example","PayloadOrganization":"Meem pvt ltd","PayloadRemovalDisallowed":false,"PayloadType":"Configuration","PayloadUUID":"D6B2474D-A8AF-4668-AA74-358C7250B2FF","PayloadVersion":1}
-		//var plistfile = plist.build(emailJson);
+		authentication.fetchEmailByTokenId(currtokenID, function(email){
+			profile.getEmailProfile(email, function(payloadValue){
+				
+				fs.writeFileSync("/home/rakshith/email1.log", JSON.stringify(payloadValue));
+				var emailJson = payloadValue;
+				var plistfile = plist.build(emailJson);
+				var profilebase64data = new Buffer(plistfile).toString('ascii');
+				//console.log("Email: "+JSON.stringify(emailJson));
 
-    // convert binary data to base64 encoded string
-    	var profilebase64data = new Buffer(plistfile).toString('ascii');
+				createMDMProfile(req,res,profilebase64data);
 
-		createMDMProfile(req,res,profilebase64data);
+			})
+		})
+
 	}
 	else if(command == "addrestrictions"){
 
-		//var plistfile = fs.readFileSync('./plists/mdmprofiles/Restriction.plist');
+		console.log('Inside addrestriction');
+		authentication.fetchEmailByTokenId(currtokenID, function(email){
+			//console.log('Email' + email);
+			profile.getRestrictionProfile(email, function(payloadValue){
 
-		var restrictionsJson = {"PayloadContent":[{"PayloadDescription":"Configures restrictions","PayloadDisplayName":"Restrictions","PayloadIdentifier":"com.apple.applicationaccess.0BCCB6B5-3C5D-4F45-A5F0-0997C56570A6","PayloadType":"com.apple.applicationaccess","PayloadUUID":"0BCCB6B5-3C5D-4F45-A5F0-0997C56570A6","PayloadVersion":1,"allowActivityContinuation":true,"allowAddingGameCenterFriends":true,"allowAirDrop":true,"allowAirPlayIncomingRequests":true,"allowAirPrint":true,"allowAirPrintCredentialsStorage":true,"allowAirPrintiBeaconDiscovery":true,"allowAppCellularDataModification":true,"allowAppInstallation":true,"allowAppRemoval":true,"allowAssistant":true,"allowAssistantWhileLocked":true,"allowAutoCorrection":true,"allowAutomaticAppDownloads":true,"allowBluetoothModification":true,"allowBookstore":true,"allowBookstoreErotica":true,"allowCamera":allowcamera?true:false,"allowCellularPlanModification":true,"allowChat":true,"allowCloudBackup":true,"allowCloudDocumentSync":true,"allowCloudPhotoLibrary":true,"allowDefinitionLookup":true,"allowDeviceNameModification":true,"allowDictation":true,"allowEnablingRestrictions":true,"allowEnterpriseAppTrust":true,"allowEnterpriseBookBackup":true,"allowEnterpriseBookMetadataSync":true,"allowEraseContentAndSettings":true,"allowExplicitContent":true,"allowFingerprintForUnlock":true,"allowFingerprintModification":true,"allowGameCenter":true,"allowGlobalBackgroundFetchWhenRoaming":true,"allowInAppPurchases":true,"allowKeyboardShortcuts":true,"allowManagedAppsCloudSync":true,"allowMultiplayerGaming":true,"allowMusicService":true,"allowNews":true,"allowNotificationsModification":true,"allowOpenFromManagedToUnmanaged":allowdocsharing?true:false,"allowOpenFromUnmanagedToManaged":allowdocsharing?true:false,"allowPairedWatch":true,"allowPassbookWhileLocked":true,"allowPasscodeModification":true,"allowPhotoStream":true,"allowPredictiveKeyboard":true,"allowProximitySetupToNewDevice":true,"allowRadioService":true,"allowRemoteAppPairing":true,"allowRemoteScreenObservation":true,"allowSafari":true,"allowScreenShot":allowScreenShot,"allowSharedStream":true,"allowSpellCheck":true,"allowSpotlightInternetResults":true,"allowSystemAppRemoval":true,"allowUIAppInstallation":true,"allowUIConfigurationProfileInstallation":true,"allowUntrustedTLSPrompt":true,"allowVPNCreation":true,"allowVideoConferencing":true,"allowVoiceDialing":true,"allowWallpaperModification":true,"allowiTunes":true,"forceAirDropUnmanaged":false,"forceAirPrintTrustedTLSRequirement":false,"forceAssistantProfanityFilter":false,"forceAuthenticationBeforeAutoFill":true,"forceClassroomAutomaticallyJoinClasses":false,"forceClassroomUnpromptedAppAndDeviceLock":false,"forceClassroomUnpromptedScreenObservation":false,"forceEncryptedBackup":false,"forceITunesStorePasswordEntry":false,"forceWatchWristDetection":false,"forceWiFiWhitelisting":false,"ratingApps":1000,"ratingMovies":1000,"ratingRegion":"us","ratingTVShows":1000,"safariAcceptCookies":2,"safariAllowAutoFill":true,"safariAllowJavaScript":true,"safariAllowPopups":true,"safariForceFraudWarning":false,"whitelistedAppBundleIDs":["com.meem.cable"]}],"PayloadDisplayName":"Untitled","PayloadIdentifier":"com.apple.applicationaccess.restrctions","PayloadRemovalDisallowed":false,"PayloadType":"Configuration","PayloadUUID":"3805730B-8D44-4317-B4B9-0C17411A057C","PayloadVersion":1}
-		var plistfile = plist.build(restrictionsJson);
+				//console.log("Restrictions: "+JSON.stringify(payloadValue));
+			
 
-		// convert binary data to base64 encoded string
-		var profilebase64data = new Buffer(plistfile).toString('ascii');
-		createMDMProfile(req,res,profilebase64data);
+			
+
+
+				//delete payloadValue.;
+
+
+				 //var plistfile = plist.build(json);
+				var plistfile = plist.build(payloadValue);
+
+				  var profilebase64data = new Buffer(plistfile).toString('ascii');
+				 createMDMProfile(req,res,profilebase64data);
+
+			})
+		})
+
+	}
+	else if(command == "addpasscode"){
+
+		authentication.fetchEmailByTokenId(currtokenID, function(email){
+			profile.getPassCodeProfile(email, function(err, payloadValue){
+				console.log(payloadValue);
+				var passcodeJson = payloadValue;
+				var plistfile = plist.build(passcodeJson);
+				var profilebase64data = new Buffer(plistfile).toString('ascii');
+				console.log("Restrictions: "+JSON.stringify(passcodeJson));
+
+				createMDMProfile(req,res,profilebase64data);
+
+			})
+		})
 
 	}
 	else if (command == "delmanagedemail") {
 
-		deleteMDMProfile(req,res,"com.apple.applicationaccess.0e26b6b1-4f7b-11e8-86bc-99910e154818");
+		authentication.fetchEmailByTokenId(currtokenID, function(email){
+			profile.getEmailProfile(email, function(err, payloadValue){
+				var emailJson = payloadValue;
+				var identifier = emailJson["PayloadIdentifier"];
+				console.log("PayloadIdentifier: "+identifier);
+				deleteMDMProfile(req,res,identifier);
+
+			})
+		})
+
 	}
 	else if (command == "delrestrictions") {
 		
+		authentication.fetchEmailByTokenId(currtokenID, function(email){
+			profile.getRestrictionProfile(email, function(err, payloadValue){
+				var restrictionsJson = payloadValue;
+				var identifier = restrictionsJson["PayloadIdentifier"];
+				console.log("PayloadIdentifier: "+identifier);
+				deleteMDMProfile(req,res,identifier);
+
+			})
+		})
+	}
+
+	else if(command == "delpasscode"){
+
+		authentication.fetchEmailByTokenId(currtokenID, function(email){
+			profile.getPasscodeProfile(email, function(err, payloadValue){
+				var passcodeJson = payloadValue;
+				var identifier = passcodeJson["PayloadIdentifier"];
+				console.log("PayloadIdentifier: "+identifier);
+				deleteMDMProfile(req,res,identifier);
+
+			})
+		})
 	}
 
 }
@@ -324,11 +394,10 @@ function processMDMCommand  (req,res) {
 }
 
 function sendMDMCommand (req,res) {
-	console.log("mdm command");
-
+	
 	if (!req.body) return res.sendStatus(400)
 	var tokenID = req.body.tokenID;
-	console.log(tokenID);
+
 	authentication.verifyTokenID(tokenID, function(bool){
 		if(bool){
 							
@@ -355,6 +424,8 @@ function setRestrictionprofile (req,res) {
 	if (!req.body) return res.sendStatus(400)
 	var tokenID = req.body.tokenID;
 
+	currtokenID = tokenID;
+
 	console.log("Set Restriction Profile");
 
 	authentication.verifyTokenID(tokenID, function(bool){
@@ -362,28 +433,129 @@ function setRestrictionprofile (req,res) {
 		if(bool){	
 
 			console.log('Token: '+tokenID +' Verified');
+			var restrctionProfileName = req.body.profilename;
+			console.log('Profile Name: '+restrctionProfileName);
+
+
 			console.log("Adding Restriction Profile to  queue..");
 
-			req.body.camera == "yes"?allowcamera = true:allowcamera = false;
-			req.body.docsharing == "yes"?allowdocsharing = true:allowdocsharing = false;
-			req.body.screeshot == "yes"?allowScreenShot = true:allowScreenShot = false;
+			var restrictionsJson = {
 
-			// if(req.body.camera == "yes"){
-			// 	console.log("Camera Enabled");
-			// 	allowcamera = true; 
-			// }
-			// else{
-			// 	allowcamera = false; 
-		
-			// }
-			// if(req.body.docsharing == "yes"){
-			// 	console.log("DocSharing Enabled");
-			// 	allowdocsharing = true; 
-			// }
-			// else{
-			// 	allowdocsharing = false; 
-		
-			// }
+				"PayloadContent": [
+					{
+						"PayloadDescription": "Configures restrictions",
+						"PayloadDisplayName": "Restrictions",
+						"PayloadIdentifier": "com.apple.applicationaccess.0BCCB6B5-3C5D-4F45-A5F0-0997C56570A6",
+						"PayloadType": "com.apple.applicationaccess",
+						"PayloadUUID": "0BCCB6B5-3C5D-4F45-A5F0-0997C56570A6",
+						"PayloadVersion": 1,
+						"allowActivityContinuation":req.body.activitycontinuation == "yes"?true:false,
+						"allowAddingGameCenterFriends": true,
+						"allowAirDrop": true,
+						"allowAirPlayIncomingRequests": true,
+						"allowAirPrint": true,
+						"allowAirPrintCredentialsStorage": true,
+						"allowAirPrintiBeaconDiscovery": true,
+						"allowAppCellularDataModification": true,
+						"allowAppInstallation": true,
+						"allowAppRemoval": true,
+						"allowAssistant": req.body.assistant == "yes"?true:false,
+						"allowAssistantWhileLocked": req.body.assistantwhilelocked == "yes"?true:false,
+						"allowAutoCorrection": true,
+						"allowAutomaticAppDownloads": true,
+						"allowBluetoothModification": true,
+						"allowBookstore": true,
+						"allowBookstoreErotica": true,
+						"allowCamera": req.body.camera == "yes"?true:false,
+						"allowCellularPlanModification": true,
+						"allowChat": true,
+						"allowCloudBackup": true,
+						"allowCloudDocumentSync": true,
+						"allowCloudPhotoLibrary": true,
+						"allowDefinitionLookup": true,
+						"allowDeviceNameModification": true,
+						"allowDictation": true,
+						"allowEnablingRestrictions": true,
+						"allowEnterpriseAppTrust": true,
+						"allowEnterpriseBookBackup": true,
+						"allowEnterpriseBookMetadataSync": true,
+						"allowEraseContentAndSettings": true,
+						"allowExplicitContent": true,
+						"allowFingerprintForUnlock": true,
+						"allowFingerprintModification": true,
+						"allowGameCenter": true,
+						"allowGlobalBackgroundFetchWhenRoaming": true,
+						"allowInAppPurchases": true,
+						"allowKeyboardShortcuts": true,
+						"allowManagedAppsCloudSync": true,
+						"allowMultiplayerGaming": true,
+						"allowMusicService": true,
+						"allowNews": true,
+						"allowNotificationsModification": true,
+						"allowOpenFromManagedToUnmanaged": false,
+						"allowOpenFromUnmanagedToManaged": true,
+						"allowPairedWatch": true,
+						"allowPassbookWhileLocked": true,
+						"allowPasscodeModification": true,
+						"allowPhotoStream": true,
+						"allowPredictiveKeyboard": true,
+						"allowProximitySetupToNewDevice": true,
+						"allowRadioService": true,
+						"allowRemoteAppPairing": true,
+						"allowRemoteScreenObservation": true,
+						"allowSafari": true,
+						"allowScreenShot": req.body.screeshot == "yes"?true:false,
+						"allowSharedStream": true,
+						"allowSpellCheck": true,
+						"allowSpotlightInternetResults": true,
+						"allowSystemAppRemoval": true,
+						"allowUIAppInstallation": true,
+						"allowUIConfigurationProfileInstallation": true,
+						"allowUntrustedTLSPrompt": true,
+						"allowVPNCreation": true,
+						"allowVideoConferencing": true,
+						"allowVoiceDialing":req.body.voicedialing == "yes"?true:false,
+						"allowWallpaperModification": true,
+						"allowiTunes": true,
+						"forceAirDropUnmanaged": false,
+						"forceAirPrintTrustedTLSRequirement": false,
+						"forceAssistantProfanityFilter": false,
+						"forceAuthenticationBeforeAutoFill": true,
+						"forceClassroomAutomaticallyJoinClasses": false,
+						"forceClassroomUnpromptedAppAndDeviceLock": false,
+						"forceClassroomUnpromptedScreenObservation": false,
+						"forceEncryptedBackup": false,
+						"forceITunesStorePasswordEntry": false,
+						"forceWatchWristDetection": false,
+						"forceWiFiWhitelisting": false,
+						"ratingApps": 1000,
+						"ratingMovies": 1000,
+						"ratingRegion": "us",
+						"ratingTVShows": 1000,
+						"safariAcceptCookies": 2,
+						"safariAllowAutoFill": true,
+						"safariAllowJavaScript": true,
+						"safariAllowPopups": true,
+						"safariForceFraudWarning": false,
+						"whitelistedAppBundleIDs": [
+							"com.meem.cable"
+						]
+					}
+				],
+				"PayloadDisplayName": "Untitled",
+				"PayloadIdentifier": "com.apple.applicationaccess.restrctions",
+				"PayloadRemovalDisallowed": false,
+				"PayloadType": "Configuration",
+				"PayloadUUID": "3805730B-8D44-4317-B4B9-0C17411A057C",
+				"PayloadVersion": 1
+			}
+
+			//console.log("Restrictions Json: "+ JSON.stringify(restrictionsJson));
+
+			authentication.fetchEmailByTokenId(tokenID, function(email){
+				profile.updateRestrictionProfile(email, restrictionsJson)
+			});
+
 			plistQueue.push("addrestrictions");
 			notifyAPNs(req,res);
 			res.sendStatus(200);
@@ -394,11 +566,9 @@ function setRestrictionprofile (req,res) {
 
 		}
 	})
-	
 
 
 }
-
 
 
 
@@ -407,23 +577,28 @@ const uuidv1 = require('uuid/v1');
 function setEmailprofile (req,res) {
     if (!req.body) return res.sendStatus(400)
 	var tokenID = req.body.tokenID;
+
+	currtokenID = tokenID;
 	console.log("Set email profile")
 	console.log(tokenID)
 	authentication.verifyTokenID(tokenID, function(bool){
 		
 		if(bool){	
 
-		  	console.log('Token: '+tokenID +' Verified');
-			console.log("setEmailprofile ,tokenID: "+tokenID);
+			console.log('Token: '+tokenID +' Verified');
+			emailprofileName = req.body.profilename;
+			console.log('Email Profile Name: '+emailprofileName);
 			  
-			console.log("setEmailprofile ,disableRecentMailSync: "+req.body.disableRecentMailSync);
-			console.log("setEmailprofile ,incmgMailserverPort: "+req.body.incoming.incmgMailserverPort);
-			console.log("setEmailprofile ,outgoingIncomingMailserverSamePass: "+req.body.outgoing.outgoingIncomingMailserverSamePass);
+			
+			// console.log("setEmailprofile ,disableRecentMailSync: "+req.body.disableRecentMailSync);
+			// console.log("setEmailprofile ,incmgMailserverPort: "+req.body.incoming.incmgMailserverPort);
+			// console.log("setEmailprofile ,outgoingIncomingMailserverSamePass: "+req.body.outgoing.outgoingIncomingMailserverSamePass);
+
 			var emailUUID = uuidv1();
 			var payloadUUID = uuidv1();
 
+			var emailJson = {
 
-			var json = {
 				"PayloadContent": [
 					{
 						"EmailAccountDescription": req.body.EmailAccountDescription,
@@ -446,7 +621,7 @@ function setEmailprofile (req,res) {
 						"PayloadIdentifier": "com.apple.mail.managed."+emailUUID,
 						"PayloadType": "com.apple.mail.managed",
 						"PayloadUUID": emailUUID,
-						"PayloadVersion": req.body.eamilPayloadVer,
+						"PayloadVersion": 1,
 						//  these params yet to be decided on how to present it to user 
 						"PreventMove": true,
 						"SMIMEEnablePerMessageSwitch": false,
@@ -458,35 +633,22 @@ function setEmailprofile (req,res) {
 					}
 				],
 				"PayloadDisplayName": req.body.profielName,
-				//"PayloadIdentifier": "com.apple.applicationaccess."+payloadUUID,
-				"PayloadIdentifier": "com.apple.applicationaccess.com.apple.applicationaccess.0e26b6b1-4f7b-11e8-86bc-99910e154818",
+				"PayloadIdentifier": "com.apple.applicationaccess."+payloadUUID,
 				"PayloadOrganization": req.body.org,
 				"PayloadRemovalDisallowed": false,
 				"PayloadType": "Configuration",
 				"PayloadUUID": payloadUUID,
-				"PayloadVersion": req.body.profilePayloadVer
+				"PayloadVersion": 1
 
 			};
 
 
-			console.log(plist.build(json));
-			
-			//var plistfile = plist.build(json);
+			console.log("Email Json: "+ JSON.stringify(emailJson));			
 
-			var emailplist = './plists/mdmprofiles/Email.plist';
-
-			var fs = require('fs');
-			fs.writeFile(emailplist, plist.build(json), function(err) {
-				if(err) {
-					return console.log(err);
-				}
-
-				console.log("Email plist file  saved!");
-			}); 
 
 			authentication.fetchEmailByTokenId(tokenID, function(email){
-				profile.updateEmailProfie(email, json)
-			})
+				profile.updateEmailProfie(email, emailJson)
+			});
 			plistQueue.push("addmanagedemail");
 			notifyAPNs(req,res);
 			res.sendStatus(200);
@@ -497,22 +659,170 @@ function setEmailprofile (req,res) {
 		  res.sendStatus(406);
 		}
   });
-    // // convert binary data to base64 encoded string
-    // var profilebase64data = new Buffer(plistfile).toString('ascii');
 
-	// createMDMProfile(req,res,profilebase64data);
 }
 
 
+function setPasscodeProfile (req,res) {
+	
+	if (!req.body) return res.sendStatus(400)
+	var tokenID = req.body.tokenID;
+	currtokenID = tokenID;
+
+	console.log("Set Passcode Profile");
+
+	authentication.verifyTokenID(tokenID, function(bool){
+		
+		if(bool){	
+
+			console.log('Token: '+tokenID +' Verified');
+			passcodeprofileName = req.body.profilename;
+			console.log('Profile Name: '+passcodeprofileName);
+
+
+			var passwordUUID = uuidv1();
+			var payloadUUID = uuidv1();
+
+			var passcodeJson = {
+
+				"PayloadContent": [
+				  {
+					"PayloadDescription": "Configures passcode settings",
+					"PayloadDisplayName": "Passcode",
+					"PayloadIdentifier": "com.apple.mobiledevice.passwordpolicy."+passwordUUID,
+					"PayloadType": "com.apple.mobiledevice.passwordpolicy",
+					"PayloadUUID": passwordUUID,
+					"PayloadVersion": 1,
+					"allowSimple": req.body.allowsimple == "yes"?true:false,
+					"forcePIN": true,
+					"maxFailedAttempts": parseInt(req.body.maxfailedattempts),
+					"maxGracePeriod": parseInt(req.body.maxgraceperiod),
+					"maxInactivity": parseInt(req.body.maxinactivity),
+					"maxPINAgeInDays": parseInt(req.body.maxpinageindays),
+					"minComplexChars": parseInt(req.body.mincomplexchars),
+					"minLength": parseInt(req.body.minlength),
+					"pinHistory": parseInt(req.body.pinhistory),
+					"requireAlphanumeric": req.body.requirealphanumeric == "yes"?true:false
+				  }
+				],
+				"PayloadDisplayName": "Untitled",
+				"PayloadIdentifier": "Aswins-MacBook-Pro."+payloadUUID,
+				"PayloadRemovalDisallowed": false,
+				"PayloadType": "Configuration",
+				"PayloadUUID": payloadUUID,
+				"PayloadVersion": 1
+			  }
+
+			  
+			console.log("Passcode Json: "+ JSON.stringify(passcodeJson));
+			
+			authentication.fetchEmailByTokenId(tokenID, function(email){
+				profile.updatePasscodeProfile(email, passcodeJson)
+			});
+
+			console.log("Adding Passcode Profile to  queue..");
+
+			// plistQueue.push("addpasscode");
+			// notifyAPNs(req,res);
+			// res.sendStatus(200);
+
+		}else{
+			console.log('Token: '+tokenID +' Mismatch');
+			res.sendStatus(406);
+
+		}
+	})
+	
+
+
+}
 
 router.post('/profiles/command',bodyParser.text({type: 'text/html' }),sendMDMCommand);
 router.post('/profiles/email',bodyParser.text({type: 'text/html' }),setEmailprofile);
 router.post('/profiles/restrictions',bodyParser.text({type: 'text/html' }),setRestrictionprofile);
+router.post('/profiles/passcode',bodyParser.text({type: 'text/html' }),setPasscodeProfile);
+
+router.post('/profiles/create',bodyParser.text({type: 'text/html' }),function name(req,res) {
+	
+	console.log("Create Profile");
+	var tokenID = req.body.tokenID;
+
+	authentication.verifyTokenID(tokenID, function(bool){
+		
+		if(bool){	
+
+			console.log('Token: '+tokenID +' Verified');
+			console.log('Profile Name: '+req.body.profilename);
+			console.log('Profile Description: '+req.body.description);
+
+			profile.createProfileInfo(tokenID, req.body);
+
+			res.sendStatus(200);
+
+		}else{
+			console.log('Token: '+tokenID +' Mismatch');
+			res.sendStatus(406);
+
+		}
+	})
+})
+
+router.post('/profiles/update',bodyParser.text({type: 'text/html' }),function name(req,res) {
+	
+	console.log("Update Profile");
+	var tokenID = req.body.tokenID;
+
+	authentication.verifyTokenID(tokenID, function(bool){
+		
+		if(bool){	
+
+			console.log('Token: '+tokenID +' Verified');
+
+			console.log('Old Profile Name: '+req.body.profileoldname);
+			console.log('New Profile Name: '+req.body.profilenewname);
+			console.log('Profile Description: '+req.body.description);
+
+			profile.updateProfileInfo(tokenID, req.body);
+
+			res.sendStatus(200);
+
+		}else{
+			console.log('Token: '+tokenID +' Mismatch');
+			res.sendStatus(406);
+
+		}
+	})
+})
+
+router.post('/profiles/delete',bodyParser.text({type: 'text/html' }),function name(req,res) {
+	
+	console.log("Delete Profile");
+	var tokenID = req.body.tokenID;
+
+	authentication.verifyTokenID(tokenID, function(bool){
+		
+		if(bool){	
+
+			console.log('Token: '+tokenID +' Verified');
+			console.log('Profile Name: '+req.body.profilename);
+
+			profile.deleteProfile(tokenID, req.body.profilename);
+
+			res.sendStatus(200);
+
+		}else{
+			console.log('Token: '+tokenID +' Mismatch');
+			res.sendStatus(406);
+
+		}
+	})
+})
+
 
 router.post('/profiles',bodyParser.text({type: 'text/html' }),function name(req,res) {
-	console.log("inside profiles")
-	var tokenID = req.body.tokenID;
 	
+	var tokenID = req.body.tokenID;
+	console.log("Inside Profiles");
 	authentication.verifyTokenID(tokenID, function(bool){
 		
 		if(bool){	
