@@ -12,7 +12,7 @@ var ctrlAuth = require('../controllers/authentication');
 var ctrlProfile = require('../controllers/profile');
 var enrollment = require('../controllers/enrollment');
 var device = require('../../device/routes/index');
-
+var system = require('../controllers/utility')
 
 
 // router.get('/', function(req, res) {
@@ -43,6 +43,7 @@ router.use('/enrollment', enrollment);
 //  Connect all our routes to our application
 router.use('/mdm', device);
 router.use('/device', device);
+router.use('/system', system);
 
 
 module.exports = router;

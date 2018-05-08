@@ -99,7 +99,7 @@ module.exports.getRestrictionProfile = function(email, cb){
             var json1 = JSON.parse(strjson);
             delete json1["_id"];
 
-            console.log(JSON.stringify(json1));
+            //console.log(JSON.stringify(json1));
 
             //console.log(JSON.stringify(json.PayloadContent[0]));
             
@@ -137,7 +137,7 @@ module.exports.getPassCodeProfile = function(email, cb){
 
 module.exports.updatePasscodeProfile = function(email, passCodeProfile){
 
-    Profile.update({ adminKeyEmail: email }, {'profileArray.passCodeProfile': passCodeProfile} , false, function (err) {
+    Profile.update({ adminKeyEmail: email }, {'profileArray.passcodeProfile': passCodeProfile} , false, function (err) {
         if (err) {
             console.log('Error while updating the passcode profile')
             console.log(err)

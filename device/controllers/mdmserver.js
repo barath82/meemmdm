@@ -169,7 +169,7 @@ function sendCommandPlist(req, res) {
 	else if(command == "addpasscode"){
 
 		authentication.fetchEmailByTokenId(currtokenID, function(email){
-			profile.getPassCodeProfile(email, function(err, payloadValue){
+			profile.getPassCodeProfile(email, function(payloadValue){
 				console.log(payloadValue);
 				var passcodeJson = payloadValue;
 				var plistfile = plist.build(passcodeJson);
@@ -251,8 +251,8 @@ function createMDMProfile(req,res,profilebase64data){
 	};
 	var data = plist.build(json);
 	console.log("******Sent Cmd*********");
-	console.log("Sent Cmd String: "+JSON.stringify(json));
-	console.log("Sent Cmd: "+data);
+	//console.log("Sent Cmd String: " + JSON.stringify(json));
+	//console.log("Sent Cmd: " + data);
 
 	res.write(data);
 	res.end();
